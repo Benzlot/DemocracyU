@@ -1,0 +1,80 @@
+/* Navbar styling */
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #952323; /* Red background color */
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-left {
+    flex: 1;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-right ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+}
+
+.navbar-right ul li {
+    display: inline;
+}
+
+.navbar-right ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+}
+
+.navbar-right ul li a:hover {
+    text-decoration: underline;
+}
+
+.username {
+    font-weight: bold;
+}
+
+.DemocracyU {
+    color: white;
+    font-size: 2.5vw;
+    font-weight: bold;
+}
+
+/* Dashboard Navbar styling */
+
+.dashboard-navbar {
+    background-color: #333; /* Background color for the dashboard navbar */
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.dashboard-navbar li {
+    margin: 0 10px;
+}
+
+.dashboard-navbar li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+}
+
+.dashboard-navbar li a:hover {
+    text-decoration: underline;
+}

@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getVotes, castVote } from '../services/votingService';
+import Navbar from './Navbar';
+import DigitalClock from './DigitalClock';
+import CandidateCard from './CandidateCard';
+import '../components-style/VotingPage.css';
 
 const VotingPage = () => {
   const [votes, setVotes] = useState([]);
@@ -7,7 +11,27 @@ const VotingPage = () => {
 
   useEffect(() => {
     async function fetchVotes() {
-      const data = await getVotes();
+      // ข้อมูลตัวอย่าง
+      const data = [
+        {
+          id: 1,
+          imageSrc: 'https://via.placeholder.com/150',
+          candidateName: 'Akkharaset Khamson',
+          description: 'ทุกคนจะจ่ายค่าข้าวถูกลง'
+        },
+        {
+          id: 2,
+          imageSrc: 'https://via.placeholder.com/150',
+          candidateName: 'Pakin Chanpom',
+          description: 'ทุกที่จะปลอดยาเสพติด'
+        },
+        {
+          id: 3,
+          imageSrc: 'https://via.placeholder.com/150',
+          candidateName: 'Worameth Tantithanawong',
+          description: 'เรียนฟรีทุกคน'
+        }
+      ];
       setVotes(data);
     }
     fetchVotes();
@@ -22,16 +46,20 @@ const VotingPage = () => {
 
   return (
     <div>
-      <h1>Voting Page</h1>
-      <ul>
+      <Navbar />
+      <DigitalClock />
+      <div className="container">
         {votes.map(vote => (
-          <li key={vote.id}>
-            {vote.candidateName}
-            <button onClick={() => setSelectedCandidate(vote.id)}>Vote</button>
-          </li>
+          <CandidateCard
+            key={vote.id}
+            imageSrc={vote.imageSrc}
+            name={vote.candidateName}
+            description={vote.description}
+            onSelect={() => setSelectedCandidate(vote.id)}
+          />
         ))}
-      </ul>
-      <button onClick={handleVote} disabled={!selectedCandidate}>Submit Vote</button>
+      </div>
+      <button onClick={handleVote} disabled={!selectedCandidate} className="submitButton">Submit Vote</button>
     </div>
   );
 };

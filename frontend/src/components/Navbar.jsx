@@ -1,12 +1,8 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom'; // Assuming you're using react-router-dom
 import { AuthContext } from '../context/AuthContext'; // Your authentication context
-<<<<<<< HEAD
 import '../components-style/Navbar.css'; // Import your CSS for styling
 import '../components-style/UserDB.css'; // Import additional CSS if needed
-=======
-import '../Components style/Navbar.css'; // Import your CSS for styling
->>>>>>> parent of b28c5af (สร้างเวลาดิจิทัล และกำลังทำ voting)
 
 const Navbar = () => {
   const { account } = useContext(AuthContext); // Assuming account contains user information if logged in

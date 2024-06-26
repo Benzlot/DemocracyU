@@ -1,6 +1,7 @@
 /* Navbar styling */
 
-body, html {
+body,
+html {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -10,10 +11,11 @@ body, html {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #952323; /* Red background color */
+    background-color: #952323;
+    /* Red background color */
     padding: 2rem;
     padding-left: 7%;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-left {
@@ -35,22 +37,25 @@ body, html {
     font-size: 2.5vw;
     font-weight: bold;
 }
-.Title{
+
+.Title {
     text-decoration: none;
     color: white;
     font-size: 2vw;
 }
-.Title:hover{
+
+.Title:hover {
     color: black;
     transition: .5s;
 }
-.login{
+
+.login {
     text-decoration: none;
     color: white;
     font-size: 1vw;
 }
 
-.login:hover{
+.login:hover {
     color: black;
     transition: .5s;
 }
@@ -75,10 +80,11 @@ body, html {
 /* Dashboard Navbar styling */
 
 .dashboard-navbar {
-    background-color: #A73121; /* Background color for the dashboard navbar */
+    background-color: #A73121;
+    /* Background color for the dashboard navbar */
     display: flex;
-   justify-content: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: relative;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
@@ -99,9 +105,38 @@ body, html {
     text-decoration: underline;
 }
 
+.navbar-login {
+    display: flex;
+    margin-top: 5%;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #952323;
+    /* Red background color */
+    padding: 75px;
+    padding-left: 7%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
+.button-login {
+    display: block;
+    margin: 20px auto;
+    padding: 25px 75px;
+    background-color: #8B0000;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
 
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-
-
-
+.button-login .login-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}

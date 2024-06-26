@@ -7,6 +7,7 @@ import VotingPage from './components/VotingPage';
 import ResultsPage from './components/ResultsPage';
 import DirectoryPage from './components/DirectoryPage';
 import EvaluationPage from './components/EvaluationPage';
+import EvaluationStudent from './components/EvaluationStudent';
 import LoginPage from './pages/LoginPage';
 
 function App() {
@@ -30,7 +31,8 @@ function App() {
             <Route path="/vote" element={<VotingPage />} />
             <Route path="/results" element={<ResultsPage />} />
             <Route path="/directory" element={<DirectoryPage />} />
-            <Route path="/evaluation" element={<EvaluationPage />} />
+            <Route path="/evaluationPage" element={<EvaluationPage />} />
+            <Route path="/evaluationStudent" element={<EvaluationStudent />} />
           </>
         )}
       </Routes>

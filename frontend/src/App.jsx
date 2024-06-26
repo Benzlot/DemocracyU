@@ -9,12 +9,14 @@ import DirectoryPage from './components/DirectoryPage';
 import EvaluationPage from './components/EvaluationPage';
 import EvaluationStudent from './components/EvaluationStudent';
 import LoginPage from './pages/LoginPage';
-
+import Navbar from './components/Navbar';
+import DigitalClock from './components/DigitalClock'
 function App() {
   const { account, userData } = useContext(AuthContext);
-  
   return (
     <Router>
+      <Navbar />
+      <DigitalClock />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         {account && userData?.jobTitle === 'Admin' ? (

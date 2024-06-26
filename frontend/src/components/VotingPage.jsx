@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getVotes, castVote } from '../services/votingService';
-import Navbar from './Navbar';
-import DigitalClock from './DigitalClock';
 import CandidateCard from './CandidateCard';
 import '../components-style/VotingPage.css';
 
@@ -45,9 +43,7 @@ const VotingPage = () => {
   };
 
   return (
-    <div>
-      <Navbar />
-      <DigitalClock />
+    <div>      
       <div className="container">
         {votes.map(vote => (
           <CandidateCard

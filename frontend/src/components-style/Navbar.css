@@ -12,6 +12,7 @@ body, html {
     justify-content: space-between;
     background-color: #952323; /* Red background color */
     padding: 2rem;
+    padding-left: 7%;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
@@ -24,30 +25,9 @@ body, html {
     align-items: center;
 }
 
-.navbar-right ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    gap: 20px;
-}
-
-.navbar-right ul li {
-    display: inline;
-}
-
-.navbar-right ul li a {
-    color: white;
-    text-decoration: none;
-    padding: 10px;
-}
-
-.navbar-right ul li a:hover {
-    text-decoration: underline;
-}
-
 .username {
     font-weight: bold;
+    color: white;
 }
 
 .DemocracyU {
@@ -55,15 +35,55 @@ body, html {
     font-size: 2.5vw;
     font-weight: bold;
 }
+.Title{
+    text-decoration: none;
+    color: white;
+    font-size: 2vw;
+}
+.Title:hover{
+    color: black;
+    transition: .5s;
+}
+.login{
+    text-decoration: none;
+    color: white;
+    font-size: 1vw;
+}
+
+.login:hover{
+    color: black;
+    transition: .5s;
+}
+
+
+/* General link styling */
+.nav-link {
+    color: white;
+    text-decoration: none;
+    padding-left: 8%;
+    padding-right: 8%;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    font-size: 1vw;
+}
+
+.nav-link:hover {
+    background-color: #952323;
+    transition: .5s;
+}
 
 /* Dashboard Navbar styling */
 
 .dashboard-navbar {
-    background-color: #333; /* Background color for the dashboard navbar */
+    background-color: #A73121; /* Background color for the dashboard navbar */
     display: flex;
-    justify-content: center;
-    padding: 10px 0;
+   justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
 }
+
 
 .dashboard-navbar li {
     margin: 0 10px;
@@ -78,3 +98,10 @@ body, html {
 .dashboard-navbar li a:hover {
     text-decoration: underline;
 }
+
+
+
+
+
+
+

@@ -140,3 +140,14 @@ html {
     height: 30px;
     margin-right: 10px;
 }
+
+.logout-button {
+    background-color: #8B0000;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 10px 20px;
+    margin-left: 20px;
+  }
+  

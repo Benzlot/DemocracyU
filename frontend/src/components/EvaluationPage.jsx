@@ -1,9 +1,9 @@
-
+import '../components-style/EvaP.css'
 const EvaluationPage = () => {
 
   return (
     <div>
-      <h1>QRCODE</h1>
+      <h1>แสกน Qr code เพื่อเข้าแบบฟอร์มการประเมิน</h1>
     </div>
   );
 };

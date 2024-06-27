@@ -43,7 +43,17 @@ const VotingPage = () => {
   };
 
   return (
-    <div>      
+    <div>
+      <div className='VTitle'>
+      <img
+            loading="lazy"
+            src="https://cdn.builder.io/api/v1/image/assets/TEMP/2ce82bc26ade1c739d9d608ab8b11d9e964f32f41dc2f611f3636da9d9abc742?apiKey=1f6df3b559f94f9cadab107301ebb8cc"
+            className="VImg"
+            alt=""
+          />
+      <div className='Votename'><h1>ลงคะแนนการเลือกตั้ง</h1></div>
+      </div>
+
       <div className="container">
         {votes.map(vote => (
           <CandidateCard

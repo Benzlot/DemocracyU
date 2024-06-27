@@ -1,0 +1,14 @@
+.Result{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.ResultName{
+    text-align: center;
+    font-size: 1.1vw;
+    padding-left: 2vw;
+}
+.ReImg{
+    width: 5vw;
+    height: 5vw;
+}

@@ -1,3 +1,16 @@
+.VTitle{
+    justify-content: center;
+    text-wrap: wrap;
+    display: flex;
+}
+.VImg{
+    width: 5vw;
+    height: 5vw;
+}
+.Votename{
+margin-left: 2vw;
+}
+
 .container {
     display: flex;
     flex-wrap: wrap;

@@ -12,7 +12,7 @@ const DigitalClock = () => {
     }, []);
 
     return (
-        <h1 style={{ textAlign: 'right', marginRight: '20px' }}>
+        <h1 style={{ textAlign: 'right', marginRight: '20px' , fontSize:'2vw' }}>
             {currentTime.toLocaleTimeString()}
         </h1>
     );

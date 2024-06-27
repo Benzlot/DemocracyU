@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { PublicClientApplication, EventType } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { msalConfig, loginRequest } from "../config/msalConfig";
-import Navbar from "../components/Navbar";
 import DigitalClock from "../components/DigitalClock";
 
 // import { AuthContext } from '../context/AuthContext'; // Importing AuthContext using curly braces

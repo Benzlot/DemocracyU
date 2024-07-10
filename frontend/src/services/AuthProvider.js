@@ -3,7 +3,7 @@ import { PublicClientApplication } from '@azure/msal-browser';
 import { msalConfig, loginRequest, graphConfig } from '../config/msalConfig';
 import axios from 'axios';
 
-export const AuthContext = createContext();
+export const AuthContext = createContext(); // Exporting AuthContext directly
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
@@ -12,11 +12,16 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    const accounts = msalInstance.getAllAccounts();
-    if (accounts.length > 0) {
-      setAccount(accounts[0]);
-      getUserData(accounts[0]);
-    }
+    const initializeMsal = async () => {
+      await msalInstance.initialize();
+      const accounts = msalInstance.getAllAccounts();
+      if (accounts.length > 0) {
+        setAccount(accounts[0]);
+        getUserData(accounts[0]);
+      }
+    };
+
+    initializeMsal();
   }, []);
 
   const login = async () => {
@@ -30,10 +35,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    msalInstance.logoutRedirect();
-    setAccount(null);
-    setUserData(null);
+  const logout = async () => {
+    try {
+      await msalInstance.logoutPopup({ postLogoutRedirectUri: '/' });
+      setAccount(null);
+      setUserData(null);
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '/';
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const getUserData = async (account) => {

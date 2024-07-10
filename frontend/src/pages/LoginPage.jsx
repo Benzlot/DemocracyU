@@ -1,11 +1,10 @@
-// import React, { useContext } from 'react';
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { PublicClientApplication, EventType } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { msalConfig, loginRequest } from "../config/msalConfig";
 import DigitalClock from "../components/DigitalClock";
-
-// import { AuthContext } from '../context/AuthContext'; // Importing AuthContext using curly braces
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from "../context/AuthContext";
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
@@ -13,7 +12,7 @@ if (
   !msalInstance.getActiveAccount() &&
   msalInstance.getAllAccounts().length > 0
 ) {
-  msalInstance.setActiveAccount(msalInstance.getActiveAccount()[0]);
+  msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
 }
 
 msalInstance.addEventCallback((event) => {
@@ -24,24 +23,18 @@ msalInstance.addEventCallback((event) => {
 });
 
 const LoginButton = () => {
-  const [account, setAccount] = useState(null);
-  const [userData, setUserData] = useState(null);
-  // const { login } = useContext(AuthContext);
-
-  const login = async () => {
-    try {
-      const loginResponse = await msalInstance.loginRedirect({
-        ...loginRequest,
-        prompt: "create",
-      });
-      setAccount(loginResponse.account);
-      setUserData(loginResponse.account);
-
-      console.log(account, userData);
-    } catch (error) {
-      console.error(error);
+  const { account, userData, login } = useContext(AuthContext);
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (account) {
+      if (userData?.jobTitle === 'Admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     }
-  };
+  }, [account, userData, navigate]);
 
   return (
     <div>

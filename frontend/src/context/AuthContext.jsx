@@ -3,40 +3,53 @@ import { PublicClientApplication } from '@azure/msal-browser';
 import { msalConfig, loginRequest, graphConfig } from '../config/msalConfig';
 import axios from 'axios';
 
-export const AuthContext = createContext(); // Exporting AuthContext directly
+export const AuthContext = createContext();
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children, navigate }) => {
   const [account, setAccount] = useState(null);
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    const accounts = msalInstance.getAllAccounts();
-    if (accounts.length > 0) {
-      setAccount(accounts[0]);
-      getUserData(accounts[0]);
-    }
-  }, []);
+    const initializeMsalInstance = async () => {
+      await msalInstance.initialize();
+      const accounts = msalInstance.getAllAccounts();
+      if (accounts.length > 0) {
+        setAccount(accounts[0]);
+        await getUserData(accounts[0], navigate);
+      }
+    };
+    initializeMsalInstance();
+  }, [navigate]);
 
   const login = async () => {
     try {
-      await msalInstance.handleRedirectPromise(); // Ensure any redirect flows are handled before calling loginPopup
+      await msalInstance.handleRedirectPromise();
       const loginResponse = await msalInstance.loginPopup(loginRequest);
       setAccount(loginResponse.account);
-      getUserData(loginResponse.account);
+      await getUserData(loginResponse.account, navigate);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const logout = () => {
-    msalInstance.logout();
-    setAccount(null);
-    setUserData(null);
+  const logout = async () => {
+    try {
+      await msalInstance.logoutPopup({
+        postLogoutRedirectUri: '/',
+      });
+      setAccount(null);
+      setUserData(null);
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '/';
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const getUserData = async (account) => {
+  const getUserData = async (account, navigate) => {
     try {
       const tokenResponse = await msalInstance.acquireTokenSilent({
         ...loginRequest,
@@ -48,6 +61,11 @@ export const AuthProvider = ({ children }) => {
         },
       });
       setUserData(userResponse.data);
+      if (userResponse.data.jobTitle === 'Admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       console.error(error);
     }

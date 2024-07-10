@@ -15,8 +15,13 @@ import DigitalClock from './components/DigitalClock';
 function App() {
   const { account, userData } = useContext(AuthContext);
 
+  if (account === undefined) {
+    // Render loading state or placeholder while initializing context
+    return <div>Loading...</div>;
+  }
+
   return (
-    <Router>
+    <>
       {/* Conditionally render Navbar */}
       {account && <Navbar />}
       
@@ -48,14 +53,18 @@ function App() {
           </>
         )}
       </Routes>
+    </>
+  );
+}
+
+function AppWrapper() {
+  return (
+    <Router>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </Router>
   );
 }
 
-export default function AppWrapper() {
-  return (
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  );
-}
+export default AppWrapper;

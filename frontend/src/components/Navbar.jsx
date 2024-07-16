@@ -18,10 +18,12 @@ const Navbar = () => {
         <div className="navbar-right">
           {account ? (
             <>
-              {userData && userData.photoUrl && (
-                <img src={userData.photoUrl} alt="Profile" className="profile-pic" />
-              )}
               <div className="username">{account.name}</div>
+              {userData && userData.photoUrl ? (
+                <img src={userData.photoUrl} alt={`${account.name}'s profile`} className="profile-pic" />
+              ) : (
+                <div>No Profile Picture</div>
+              )}
               <button onClick={logout} className="logout-button">Logout</button>
             </>
           ) : (

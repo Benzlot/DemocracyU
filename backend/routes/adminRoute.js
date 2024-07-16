@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
+const User = require('../models/userModel');
 
 // Get user by email
 router.get('/:email', async (req, res) => {

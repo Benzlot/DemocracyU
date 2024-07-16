@@ -1,3 +1,4 @@
+// controllers/votingController.js
 const { getAllVotes, castVote } = require('../models/votingModel');
 
 exports.getVotes = async (req, res) => {

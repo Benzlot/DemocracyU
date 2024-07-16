@@ -75,12 +75,6 @@ export const AuthProvider = ({ children, navigate }) => {
         photoUrl
       });
 
-      // Debugging: log userData
-      console.log("UserData:", {
-        ...userResponse.data,
-        photoUrl
-      });
-
       if (userResponse.data.jobTitle === 'Admin') {
         navigate('/admin');
       } else {

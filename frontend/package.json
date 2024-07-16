@@ -10,12 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@azure/msal-browser": "^3.16.0",
-    "@azure/msal-react": "^2.0.18",
+    "@azure/msal-browser": "^3.19.0",
+    "@azure/msal-react": "^2.0.20",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
     "axios": "^1.7.2",
+    "chart.js": "^4.4.3",
+    "chroma-js": "^2.4.2",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.23.1",
+    "react-router-dom": "^6.25.0",
+    "react-spring": "^9.7.3",
     "socket.io-client": "^4.7.5"
   },
   "devDependencies": {

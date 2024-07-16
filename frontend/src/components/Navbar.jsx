@@ -1,5 +1,3 @@
-// Navbar.js
-
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
@@ -7,18 +5,25 @@ import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
 
 const Navbar = () => {
-  const { account, logout } = useContext(AuthContext);
+  const { account, userData, logout } = useContext(AuthContext);
 
   return (
     <div>
       <div className="navbar">
         <div className="navbar-left">
-          <div className="DemocracyU"><Link to="/" className="Title">DemocracyU</Link></div>
+          <div className="DemocracyU">
+            <Link to="/" className="Title">DemocracyU</Link>
+          </div>
         </div>
         <div className="navbar-right">
           {account ? (
             <>
-              <div className="username">Welcome, {account.name}</div>
+              <div className="username">{account.name}</div>
+              {userData && userData.photoUrl ? (
+                <img src={userData.photoUrl} alt={`${account.name}'s profile`} className="profile-pic" />
+              ) : (
+                <div>No Profile Picture</div>
+              )}
               <button onClick={logout} className="logout-button">Logout</button>
             </>
           ) : (

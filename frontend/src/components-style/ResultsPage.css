@@ -1,0 +1,158 @@
+/* ResultsPage.css */
+
+.results-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.result-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.result-img {
+    max-width: 100%;
+    height: auto;
+}
+
+.result-title h1 {
+    font-size: 24px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.election-results {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.chart-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+}
+
+.chart-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.legend {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.legend div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.legend div span {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.candidates-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+}
+
+.candidate {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.candidate-rank {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.candidate-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.candidate-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.candidate-votes {
+    font-size: 16px;
+}
+.Result {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.ResultName {
+    text-align: center;
+    font-size: 1.1vw;
+    padding-left: 2vw;
+}
+
+.ReImg {
+    width: 5vw;
+    height: 5vw;
+}
+.candidates-container .candidate {
+    transition: transform 500s ease;
+}
+.candidate {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.candidate-rank {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.candidate-info {
+    position: relative;
+    /* เพิ่มส่วนนี้ */
+}
+
+.candidate-name {
+    position: relative;
+    /* เพิ่มส่วนนี้ */
+    z-index: 1;
+    /* เพิ่มส่วนนี้ */
+}
+
+.candidate-votes {
+    position: relative;
+    /* เพิ่มส่วนนี้ */
+    z-index: 1;
+    /* เพิ่มส่วนนี้ */
+}

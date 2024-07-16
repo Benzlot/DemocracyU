@@ -60,7 +60,21 @@ export const AuthProvider = ({ children, navigate }) => {
           Authorization: `Bearer ${tokenResponse.accessToken}`,
         },
       });
-      setUserData(userResponse.data);
+
+      const photoResponse = await axios.get(`${graphConfig.graphMeEndpoint}/photo/$value`, {
+        headers: {
+          Authorization: `Bearer ${tokenResponse.accessToken}`,
+        },
+        responseType: 'blob'
+      });
+
+      const photoUrl = URL.createObjectURL(photoResponse.data);
+
+      setUserData({
+        ...userResponse.data,
+        photoUrl
+      });
+
       if (userResponse.data.jobTitle === 'Admin') {
         navigate('/admin');
       } else {

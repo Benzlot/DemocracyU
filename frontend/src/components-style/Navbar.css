@@ -149,5 +149,12 @@ html {
     cursor: pointer;
     padding: 10px 20px;
     margin-left: 20px;
-  }
-  
+}
+
+.profile-pic {
+    margin-left: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getVotes, castVote } from '../services/votingService';
 import CandidateCard from './CandidateCard';
 import '../components-style/VotingPage.css';
+import { getCandidates } from '../services/candidateService';
 
 const VotingPage = () => {
   const [votes, setVotes] = useState([]);
@@ -9,31 +10,86 @@ const VotingPage = () => {
 
   useEffect(() => {
     async function fetchVotes() {
+
+      const rawData = await getCandidates()
       // ข้อมูลตัวอย่าง
-      const data = [
-        {
-          id: 1,
-          imageSrc: 'https://via.placeholder.com/150',
-          candidateName: 'Akkharaset Khamson',
-          description: 'ทุกคนจะจ่ายค่าข้าวถูกลง'
-        },
-        {
-          id: 2,
-          imageSrc: 'https://via.placeholder.com/150',
-          candidateName: 'Pakin Chanpom',
-          description: 'ทุกที่จะปลอดยาเสพติด'
-        },
-        {
-          id: 3,
-          imageSrc: 'https://via.placeholder.com/150',
-          candidateName: 'Worameth Tantithanawong',
-          description: 'เรียนฟรีทุกคน'
-        }
-      ];
+      const data = mapCandidate(rawData)
+      // const data = [
+      //   {
+      //     id: 1,
+      //     imageSrc: 'https://via.placeholder.com/150',
+      //     candidateName: 'Akkharaset Khamson',
+      //     description: 'ทุกคนจะจ่ายค่าข้าวถูกลง'
+      //   },
+      //   {
+      //     id: 2,
+      //     imageSrc: 'https://via.placeholder.com/150',
+      //     candidateName: 'Pakin Chanpom',
+      //     description: 'ทุกที่จะปลอดยาเสพติด'
+      //   },
+      //   {
+      //     id: 3,
+      //     imageSrc: 'https://via.placeholder.com/150',
+      //     candidateName: 'Worameth Tantithanawong',
+      //     description: 'เรียนฟรีทุกคน'
+      //   }
+      // ];
       setVotes(data);
     }
     fetchVotes();
   }, []);
+  // [
+  //   {
+  //     _id: new ObjectId('66811afdaef6e940cb23c27f'),
+  //     id: '01',
+  //     name: 'Akkaraset Khamsorn',
+  //     student_id: '6452100141',
+  //     faculty: 'ET',
+  //     branch: 'DIT',
+  //     vision: 'ทุกคนจะจ่ายค่าข้าวถูกลง'
+  //   },
+  //   {
+  //     _id: new ObjectId('66811c729ee77fb33fdd45a4'),
+  //     id: '02',
+  //     name: 'Pakin Chanpom',
+  //     student_id: '6452100999',
+  //     faculty: 'ET',
+  //     branch: 'DIT',
+  //     vision: 'ทุกที่จะปลอดยาเสพติด'
+  //   },
+  //   {
+  //     _id: new ObjectId('66811c8b9ee77fb33fdd45a5'),
+  //     id: '03',
+  //     name: 'Worameth Tantithanawong',
+  //     student_id: '6452100967',
+  //     faculty: 'ET',
+  //     branch: 'DIT',
+  //     vision: 'เรียนฟรีทุกคน'
+  //   },
+  //   {
+  //     _id: new ObjectId('66811cd49ee77fb33fdd45a7'),
+  //     id: '04',
+  //     name: 'Papimol Kaewlok',
+  //     student_id: '6452100989',
+  //     faculty: 'ET',
+  //     branch: 'DIT',
+  //     vision: 'สั่งโปรเจคปีละ 1 ครั้ง'
+  //   }
+  // ]
+  const mapCandidate = (rawData) =>{
+    const mappedData = rawData.map((data)=>{
+      let map = {
+        id: parseInt(data.id, 10),//cast String to int 
+        imageSrc: 'https://via.placeholder.com/150',
+        candidateName: data.name,
+        description: data.vision
+      }
+
+      return map
+    })
+
+    return mappedData
+  }
 
   const handleVote = async () => {
     if (selectedCandidate) {

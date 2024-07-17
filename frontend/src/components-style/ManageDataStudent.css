@@ -1,0 +1,28 @@
+/* ManageDataStudent.css */
+.VTitle {
+    justify-content: center;
+    text-wrap: wrap;
+    display: flex;
+}
+
+.VImg {
+    width: 5vw;
+    height: 5vw;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.button {
+    margin-bottom: 20px;
+}

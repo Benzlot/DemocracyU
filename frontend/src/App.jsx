@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { AuthContext, AuthProvider } from './context/AuthContext';
 import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
@@ -11,23 +11,30 @@ import EvaluationStudent from './components/EvaluationStudent';
 import LoginPage from './pages/LoginPage';
 import Navbar from './components/Navbar';
 import DigitalClock from './components/DigitalClock';
+import ManageDataStudent from './components/ManageDataStudent';
+import ManageDataCandidate from './components/ManageDataCandidate';
 
 function App() {
   const { account, userData } = useContext(AuthContext);
+  const location = useLocation();
 
   if (account === undefined) {
     // Render loading state or placeholder while initializing context
     return <div>Loading...</div>;
   }
 
+  const noNavbarPaths = ['/login', '/', '/manage-student','/manage-candidate']; // Add paths where you don't want to show the Navbar
+
+  const showNavbar = account && !noNavbarPaths.includes(location.pathname);
+
   return (
     <>
       {/* Conditionally render Navbar */}
-      {account && <Navbar />}
-      
+      {showNavbar && <Navbar />}
+
       {/* Conditionally render DigitalClock */}
-      {account && <DigitalClock />}
-      
+      {showNavbar && <DigitalClock />}
+
       <Routes>
         {/* Render LoginPage if not logged in */}
         {!account ? (
@@ -35,7 +42,7 @@ function App() {
         ) : account && userData?.jobTitle === 'Admin' ? (
           <>
             <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/vote" element={<VotingPage />} />
+            <Route path="/manage-student" element={<ManageDataStudent />} />
             <Route path="/results" element={<ResultsPage />} />
             <Route path="/directory" element={<DirectoryPage />} />
             <Route path="/evaluation" element={<EvaluationPage />} />
@@ -43,7 +50,9 @@ function App() {
           </>
         ) : (
           <>
-            <Route path="/" element={<UserDashboard />} />
+            <Route path="/" element={<AdminDashboard />} />   //UserDashboard
+            <Route path="/manage-student" element={<ManageDataStudent />} />
+            <Route path="/manage-candidate" element={<ManageDataCandidate />} />
             <Route path="/vote" element={<VotingPage />} />
             <Route path="/results" element={<ResultsPage />} />
             <Route path="/directory" element={<DirectoryPage />} />

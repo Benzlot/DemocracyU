@@ -1,36 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import '../components-style/DirectP.css'
+import { getCandidates } from '../services/candidateService';
 
 const DirectoryPage = () => {
   const [candidates, setCandidates] = useState([]);
 
   useEffect(() => {
     async function fetchCandidates() {
-      // Sample data
-      const data = [
-        {
-          id: 1,
-          imageSrc: 'https://via.placeholder.com/150',
-          candidateName: 'Akkharaset Khamson',
-          description: 'ประธานสาขา DIT64'
-        },
-        {
-          id: 2,
-          imageSrc: 'https://via.placeholder.com/150',
-          candidateName: 'Pakin Chanpom',
-          description: 'เลขานุกาสาขา DIT64'
-        },
-        {
-          id: 3,
-          imageSrc: 'https://via.placeholder.com/150',
-          candidateName: 'Worameth Tantithanawong',
-          description: 'รองประธานสาขา DIT64'
-        }
-      ];
+      const rawData = await getCandidates()
+      // ข้อมูลตัวอย่าง
+      const data = mapCandidate(rawData)
       setCandidates(data);
     }
     fetchCandidates();
   }, []);
+
+  const mapCandidate = (rawData) =>{
+    const mappedData = rawData.map((data)=>{
+      let map = {
+        id: parseInt(data.id, 10),//cast String to int 
+        imageSrc: 'https://via.placeholder.com/150',
+        candidateName: data.name,
+        description: data.vision
+      }
+
+      return map
+    })
+
+    return mappedData
+  }
 
   return (
     <div>

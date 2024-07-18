@@ -43,22 +43,22 @@ const AdminDashboard = () => {
         <DigitalClock />
       </div>
       <div className="function-buttons">
-        <button className="function-button" onClick={() => handleNavigate('/manage-student')}>
+        <a className="function-button" onClick={() => handleNavigate('/manage-student')}>
           <img src="https://krishplayschool.com/images/icons/graduation.svg" alt="Student Management" />
           จัดการข้อมูลนักศึกษา
-        </button>
-        <button className="function-button" onClick={() => handleNavigate('/manage-candidate')}>
+        </a>
+        <a className="function-button" onClick={() => handleNavigate('/manage-candidate')}>
           <img src="https://cdn-icons-png.freepik.com/512/2393/2393401.png" alt="Candidate Management" />
           จัดการข้อมูลผู้ลงสมัคร
-        </button>
-        <button className="function-button">
+        </a>
+        <a className="function-button" href='https://docs.google.com/forms/d/10xfy6m5XSpQlbt1pl3Bwi30ag_GByH570sgOBpmKAdo/edit' target='_blank' rel='noopener noreferrer'>
           <img src="https://www.forest.go.th/checkpoint/wp-content/uploads/sites/30/2024/05/10897892.png" alt="Position Evaluation" />
           แบบประเมินผู้ดำรงตำแหน่ง
-        </button>
-        <button className="function-button" onClick={() => handleNavigate('/manage-voting')}>
+        </a>
+        <a className="function-button" onClick={() => handleNavigate('/manage-voting-list')}>
           <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/2ce82bc26ade1c739d9d608ab8b11d9e964f32f41dc2f611f3636da9d9abc742?apiKey=1f6df3b559f94f9cadab107301ebb8cc" alt="Election Management" />
           จัดการการเลือกตั้ง
-        </button>
+        </a>
       </div>
     </div>
   );

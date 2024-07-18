@@ -13,7 +13,7 @@ import Navbar from './components/Navbar';
 import DigitalClock from './components/DigitalClock';
 import ManageDataStudent from './components/ManageDataStudent';
 import ManageDataCandidate from './components/ManageDataCandidate';
-import ManageVoting from './components/MangeVoting';
+import ManageVoting from './components/ManageVoting';
 import ManageVotingList from './components/ManageVotingList';
 import EditVoting from './components/EditVoting';
 
@@ -26,9 +26,11 @@ function App() {
     return <div>Loading...</div>;
   }
 
-  const noNavbarPaths = ['/login', '/', '/manage-student', '/manage-candidate', '/manage-voting']; // Add paths where you don't want to show the Navbar
+  // Define paths where Navbar should not be shown
+  const noNavbarPaths = ['/login', '/admin', '/manage-student', '/manage-candidate', '/manage-voting', '/manage-voting-list', '/edit-voting'];
 
-  const showNavbar = account && !noNavbarPaths.includes(location.pathname);
+  // Check if current path is in noNavbarPaths
+  const showNavbar = account && !noNavbarPaths.some(path => location.pathname.startsWith(path));
 
   return (
     <>
@@ -46,17 +48,21 @@ function App() {
           <>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/manage-student" element={<ManageDataStudent />} />
-            <Route path="/results" element={<ResultsPage />} />
-            <Route path="/directory" element={<DirectoryPage />} />
-            <Route path="/evaluation" element={<EvaluationPage />} />
+            <Route path="/manage-candidate" element={<ManageDataCandidate />} />
+            <Route path="/manage-voting-list" element={<ManageVotingList />} />
+            <Route path="/edit-voting/:id" element={<EditVoting />} />
+            <Route path="/manage-voting" element={<ManageVoting />} />
             <Route path="*" element={<Navigate to="/admin" />} />
           </>
         ) : (
           <>
-            <Route path="/" element={<AdminDashboard />} />   //UserDashboard
+            <Route path="/" element={<UserDashboard />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/manage-student" element={<ManageDataStudent />} />
             <Route path="/manage-candidate" element={<ManageDataCandidate />} />
-            <Route path="/manage-voting" element={<EditVoting />} />
+            <Route path="/manage-voting-list" element={<ManageVotingList />} />
+            <Route path="/edit-voting/:id" element={<EditVoting />} />
+            <Route path="/manage-voting" element={<ManageVoting />} />
             <Route path="/vote" element={<VotingPage />} />
             <Route path="/results" element={<ResultsPage />} />
             <Route path="/directory" element={<DirectoryPage />} />

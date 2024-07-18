@@ -13,6 +13,9 @@ import Navbar from './components/Navbar';
 import DigitalClock from './components/DigitalClock';
 import ManageDataStudent from './components/ManageDataStudent';
 import ManageDataCandidate from './components/ManageDataCandidate';
+import ManageVoting from './components/MangeVoting';
+import ManageVotingList from './components/ManageVotingList';
+import EditVoting from './components/EditVoting';
 
 function App() {
   const { account, userData } = useContext(AuthContext);
@@ -23,7 +26,7 @@ function App() {
     return <div>Loading...</div>;
   }
 
-  const noNavbarPaths = ['/login', '/', '/manage-student','/manage-candidate']; // Add paths where you don't want to show the Navbar
+  const noNavbarPaths = ['/login', '/', '/manage-student', '/manage-candidate', '/manage-voting']; // Add paths where you don't want to show the Navbar
 
   const showNavbar = account && !noNavbarPaths.includes(location.pathname);
 
@@ -53,6 +56,7 @@ function App() {
             <Route path="/" element={<AdminDashboard />} />   //UserDashboard
             <Route path="/manage-student" element={<ManageDataStudent />} />
             <Route path="/manage-candidate" element={<ManageDataCandidate />} />
+            <Route path="/manage-voting" element={<EditVoting />} />
             <Route path="/vote" element={<VotingPage />} />
             <Route path="/results" element={<ResultsPage />} />
             <Route path="/directory" element={<DirectoryPage />} />

@@ -6,7 +6,7 @@ import '../components-style/UserDB.css';
 import '../components-style/AdminDashboard.css';
 import '../components-style/ManageVoting.css';
 import '../components-style/ManageDataStudent.css';
-import DigitalClock from '../components/DigitalClock';
+import DigitalClock from './DigitalClock';
 
 const ManageVoting = () => {
     const { account, userData, logout } = useContext(AuthContext);
@@ -32,6 +32,13 @@ const ManageVoting = () => {
         } else {
             setError('');
         }
+    };
+
+    const handleConfirm = () => {
+        // Handle saving data or any other logic here
+
+        // Navigate back to ManageVotingList after saving
+        navigate('.../');
     };
 
     const handleSubmit = (e) => {
@@ -118,7 +125,7 @@ const ManageVoting = () => {
                     </div>
                     {error && <div className="error">{error}</div>}
                     <div className="form-group button">
-                        <button type="submit" className="btn btn-success">ยืนยัน</button>
+                        <button type="submit" className="btn btn-success" onClick={handleConfirm}>ยืนยัน</button>
                     </div>
                 </form>
             </div>

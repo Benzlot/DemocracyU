@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
 import '../components-style/AdminDashboard.css';
@@ -11,6 +12,11 @@ import '../components-style/ManageVotingList.css';
 
 const ManageVotingList = () => {
     const { account, userData, logout } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    const handleNavigate = (path) => {
+        navigate(path);
+    };
 
     return (
         <div>
@@ -72,7 +78,7 @@ const ManageVotingList = () => {
                     </tbody>
                 </table>
                 <div className="add-voting-button">
-                    <button className="btn btn-success">
+                    <button className="btn btn-success" onClick={() => handleNavigate('/manage-voting')}>
                         <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/2ce82bc26ade1c739d9d608ab8b11d9e964f32f41dc2f611f3636da9d9abc742?apiKey=1f6df3b559f94f9cadab107301ebb8cc" alt="icon" className="button-icon" /> เพิ่มการเลือกตั้ง
                     </button>
                 </div>

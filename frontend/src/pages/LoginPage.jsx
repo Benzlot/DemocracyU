@@ -25,10 +25,10 @@ msalInstance.addEventCallback((event) => {
 const LoginButton = () => {
   const { account, userData, login } = useContext(AuthContext);
   const navigate = useNavigate();
-  
+  //userData.isAdmin : true == Admin : false != Admin
   useEffect(() => {
     if (account) {
-      if (userData?.jobTitle === 'Admin') {
+      if (userData.isAdmin) {
         navigate('/admin');
       } else {
         navigate('/');

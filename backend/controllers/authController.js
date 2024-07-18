@@ -1,43 +1,35 @@
-// controllers/authController.js
-const { PublicClientApplication } = require('@azure/msal-node');
-const jwt = require('jsonwebtoken');
-const config = require('../config');
-const User = require('../models/userModel');
+// controllers/candidateController.js
+const Admin = require('../models/adminModel');
+const mongoose = require('mongoose');
 
-const msalInstance = new PublicClientApplication(config.msalConfig);
-
-exports.login = async (req, res) => {
+async function checkAdmin (req, res) {
   try {
-    const { username, password } = req.body;
-    const response = await msalInstance.acquireTokenByUsernamePassword({
-      scopes: ["user.read"],
-      username,
-      password,
+    const { mail } = req.body;
+
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      dbName: 'DemocracyU',
     });
+    console.log('MongoDB connected');
+      
+    let admin = await Admin.findOne({ mail: mail }).lean().exec();
+    // let adminall = await Admin.find();
 
-    const user = await User.findOne({ email: username });
-    const token = jwt.sign({ userId: user.id, role: user.role }, config.jwtSecret);
-    res.json({ token, user });
+    // let addedadmin = new Admin({});
+
+    // await addedadmin.save();
+
+    console.log("found :", admin)
+
+    res.status(200).json(admin);
   } catch (error) {
-    res.status(401).json({ error: 'Authentication failed', message: error.message });
+    res.status(500).json({ error: 'Failed to fetch candidates' });
+  } finally {
+    mongoose.connection.close();
   }
 };
 
-// Check if a user is admin by email
-exports.checkAdmin = async (req, res) => {
-  const { email } = req.query;
-
-  try {
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    const isAdmin = user.isAdmin;
-    res.json({ isAdmin });
-  } catch (error) {
-    console.error('Error checking admin status:', error.message);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
+module.exports = {
+    checkAdmin,
+}

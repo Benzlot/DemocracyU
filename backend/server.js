@@ -14,10 +14,12 @@ app.use(express.json());
 const userRoutes = require('./routes/userRoute');
 const adminRoutes = require('./routes/adminRoute');
 const candidateRoutes = require('./routes/candidateRoutes');
+const votingRoutes = require('./routes/votingRoutes')
 
 app.use('/api/candidates', candidateRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admins', adminRoutes);
+app.use('/api/vote', votingRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

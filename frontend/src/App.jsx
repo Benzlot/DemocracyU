@@ -18,7 +18,7 @@ import ManageVotingList from './components/ManageVotingList';
 import EditVoting from './components/EditVoting';
 
 function App() {
-  const { account, userData } = useContext(AuthContext);
+  const { account, userData, isAdmin } = useContext(AuthContext);
   const location = useLocation();
 
   if (account === undefined) {
@@ -44,7 +44,7 @@ function App() {
         {/* Render LoginPage if not logged in */}
         {!account ? (
           <Route path="/" element={<LoginPage />} />
-        ) : account && userData?.jobTitle === 'Admin' ? (
+        ) : account && isAdmin ? (
           <>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/manage-student" element={<ManageDataStudent />} />
@@ -57,12 +57,6 @@ function App() {
         ) : (
           <>
             <Route path="/" element={<UserDashboard />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/manage-student" element={<ManageDataStudent />} />
-            <Route path="/manage-candidate" element={<ManageDataCandidate />} />
-            <Route path="/manage-voting-list" element={<ManageVotingList />} />
-            <Route path="/edit-voting/:id" element={<EditVoting />} />
-            <Route path="/manage-voting" element={<ManageVoting />} />
             <Route path="/vote" element={<VotingPage />} />
             <Route path="/results" element={<ResultsPage />} />
             <Route path="/directory" element={<DirectoryPage />} />

@@ -1,13 +1,13 @@
-const mysql = require('mysql2');
-const config = require('../config');
+// Candidate.js (mongoose model example)
+const mongoose = require('mongoose');
 
-const pool = mysql.createPool(config.dbConfig).promise();
+const VoteSchema = new mongoose.Schema({
+  index: mongoose.Schema.Types.Decimal128,
+  candidate_id: String,
+  hashed_data: String,
+  previous_hash: String,
+  nonce: String
+  // Add other fields as needed
+});
 
-exports.getAllVotes = async () => {
-  const [rows] = await pool.query('SELECT * FROM votes');
-  return rows;
-};
-
-exports.castVote = async (userId, candidateId) => {
-  await pool.query('INSERT INTO votes (user_id, candidate_id) VALUES (?, ?)', [userId, candidateId]);
-};
+module.exports = mongoose.model('vote', VoteSchema);

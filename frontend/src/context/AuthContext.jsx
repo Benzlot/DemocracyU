@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { PublicClientApplication } from '@azure/msal-browser';
 import { msalConfig, loginRequest, graphConfig } from '../config/msalConfig';
+import { checkAdmin } from '../services/authService';
 import axios from 'axios';
 
 export const AuthContext = createContext();
@@ -10,6 +11,7 @@ const msalInstance = new PublicClientApplication(msalConfig);
 export const AuthProvider = ({ children, navigate }) => {
   const [account, setAccount] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [isAdmin, setIsAdmin]  = useState(null)
 
   useEffect(() => {
     const initializeMsalInstance = async () => {
@@ -61,6 +63,10 @@ export const AuthProvider = ({ children, navigate }) => {
         },
       });
 
+      const scanAdmin = await checkAdmin(userResponse.data.userPrincipalName);
+      // console.log(scanAdmin, userResponse.data.userPrincipalName)
+      setIsAdmin(scanAdmin ? true : false)
+
       const photoResponse = await axios.get(`${graphConfig.graphMeEndpoint}/photo/$value`, {
         headers: {
           Authorization: `Bearer ${tokenResponse.accessToken}`,
@@ -72,21 +78,21 @@ export const AuthProvider = ({ children, navigate }) => {
 
       setUserData({
         ...userResponse.data,
-        photoUrl
+        photoUrl,
       });
 
-      if (userResponse.data.jobTitle === 'Admin') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
+      // if (userResponse.data.jobTitle === 'Admin') {
+      //   navigate('/admin');
+      // } else {
+      //   navigate('/');
+      // }
     } catch (error) {
       console.error(error);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ account, userData, login, logout }}>
+    <AuthContext.Provider value={{ account, userData, isAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

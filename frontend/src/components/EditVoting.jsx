@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from 'react';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
@@ -10,11 +10,25 @@ import DigitalClock from '../components/DigitalClock';
 
 const EditVoting = () => {
     const { account, userData, logout } = useContext(AuthContext);
-    const [electionName, setElectionName] = useState('');
-    const [electionType, setElectionType] = useState('');
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
+    const { id } = useParams();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // Extract the voting data from location.state
+    const { voting } = location.state || {};
+
+    const [electionName, setElectionName] = useState(voting ? voting.name : '');
+    const [electionType, setElectionType] = useState(voting ? voting.type : '');
+    const [startDate, setStartDate] = useState(voting ? voting.start : '');
+    const [endDate, setEndDate] = useState(voting ? voting.end : '');
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        // Handle potential fallback if voting is undefined
+        if (!voting) {
+            navigate('/manage-voting-list');
+        }
+    }, [voting, navigate]);
 
     const handleStartDateChange = (e) => {
         setStartDate(e.target.value);
@@ -41,7 +55,6 @@ const EditVoting = () => {
 
     const handleEmergencyClose = () => {
         // Handle emergency close logic here
-        // You can make an API call to close the voting immediately
         console.log("Emergency close triggered");
     };
 
@@ -125,7 +138,7 @@ const EditVoting = () => {
                     {error && <div className="error">{error}</div>}
                     <div className="form-group button">
                         <button type="submit" className="btn btn-success">ยืนยัน</button>
-                        <button type="button" className="btn btn-danger" onClick={() => history.push('/manage-voting-list')}>ยกเลิก</button>
+                        <button type="button" className="btn btn-danger" onClick={() => navigate('/manage-voting-list')}>ยกเลิก</button>
                     </div>
                     <div className="form-group button">
                         <button

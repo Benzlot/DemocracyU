@@ -35,7 +35,7 @@ const NavbarAdmin = () => {
                 <div className="dashboard-navbar">
                     <Link to="/manage-student" className="nav-link">จัดการข้อมูลนักศึกษา</Link>
                     <Link to="/manage-candidate" className="nav-link">จัดการข้อมูลผู้ลงสมัคร</Link>
-                    <Link to="/manage-voting" className="nav-link">จัดการการเลือกตั้ง</Link>
+                    <Link to="/manage-voting-list" className="nav-link">จัดการการเลือกตั้ง</Link>
                     <Link to="/manage-evaluation" className="nav-link">แบบประเมินผู้ดำรงตำแหน่ง</Link>
                 </div>
             )}

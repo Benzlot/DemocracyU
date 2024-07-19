@@ -4,12 +4,16 @@ import DigitalClock from '../components/DigitalClock';
 import { IconButton, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { useNavigate } from 'react-router-dom';
 import '../components-style/ManageDataStudent.css';
+import '../components-style/ManageVoting.css';
 
 const ManageDataCandidate = () => {
     const [students, setStudents] = useState([]);
+    const [electionType, setElectionType] = useState('');
     const [open, setOpen] = useState(false);
-    const [newStudent, setNewStudent] = useState({ name: '', studentId: '', faculty: '', major: '', vision: ''});
+    const [newStudent, setNewStudent] = useState({ name: '', studentId: '', faculty: '', major: '', vision: '' });
+    const navigate = useNavigate();
 
     const handleDelete = (index) => {
         const updatedStudents = students.filter((_, i) => i !== index);
@@ -34,25 +38,74 @@ const ManageDataCandidate = () => {
 
     const handleSubmit = () => {
         setStudents(prevStudents => [...prevStudents, newStudent]);
-        setNewStudent({ name: '', studentId: '', faculty: '', major: '' , vision: ''});
+        setNewStudent({ name: '', studentId: '', faculty: '', major: '', vision: '' });
         handleClose();
     };
+
+    // ฟังก์ชัน handleConfirm
+    const handleConfirm = () => {
+        // ตรวจสอบว่ามีการเลือก electionType หรือไม่
+        if (electionType) {
+            navigate('/admin');
+        } else {
+            // หากไม่มีการเลือก electionType แสดงการแจ้งเตือน
+            alert('กรุณาเลือกการเลือกตั้ง');
+        }
+    };
+
+    // ฟังก์ชันสำหรับบันทึกข้อมูล (ตัวอย่าง)
+    const saveData = async (data) => {
+        try {
+            // ตัวอย่างการบันทึกข้อมูลไปยังเซิร์ฟเวอร์
+            const response = await fetch('/api/save-election', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            return await response.json();
+        } catch (error) {
+            throw error;
+        }
+    };
+
 
     return (
         <>
             <NavbarAdmin />
             <DigitalClock />
             <div>
-                <div className='VTitle'>
-                    <img
-                        loading="lazy"
-                        src="https://cdn-icons-png.freepik.com/512/2393/2393401.png"
-                        className="VImg"
-                        alt=""
-                    />
-                    <div className='Votename'><h1>จัดการข้อมูลผู้ลงสมัคร</h1></div>
-                </div>
+                <div className='election-form-container'>
 
+                    <div className='VTitle'>
+                        <img
+                            loading="lazy"
+                            src="https://cdn-icons-png.freepik.com/512/2393/2393401.png"
+                            className="VImg"
+                            alt=""
+                        />
+                        <div className='Votename'><h1>จัดการข้อมูลผู้ลงสมัคร</h1></div>
+                    </div>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="electionType">เลือกการเลือกตั้ง:</label>
+                    <select
+                        id="electionType"
+                        value={electionType}
+                        onChange={(e) => setElectionType(e.target.value)}
+                        required
+                    >
+                        <option value="">เลือก</option>
+                        <option value="1">การเลือกตั้งคณะวิศวกรรมศาสตร์และเทคโนโลยี</option>
+                        <option value="2">การเลือกตั้งสาขา DIT</option>
+                    </select>
+                </div>
                 <TableContainer component={Paper} style={{ maxHeight: 400, overflowY: 'auto' }}>
                     <Table>
                         <TableHead>
@@ -93,6 +146,9 @@ const ManageDataCandidate = () => {
                     >
                         เพิ่มรายชื่อสมาชิก
                     </Button>
+                </div>
+                <div className="form-group button">
+                    <button type="submit" className="btn btn-success" onClick={handleConfirm}>ยืนยัน</button>
                 </div>
             </div>
 

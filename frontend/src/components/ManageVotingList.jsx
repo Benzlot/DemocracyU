@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
 import '../components-style/AdminDashboard.css';
@@ -17,6 +16,15 @@ const ManageVotingList = () => {
     const handleNavigate = (path) => {
         navigate(path);
     };
+
+    const handleEdit = (voting) => {
+        navigate(`/edit-voting/${voting.id}`, { state: { voting } });
+    };
+
+    const votingData = [
+        { id: 1, name: 'การเลือกตั้งคณะวิศวกรรมศาสตร์และเทคโนโลยี', type: 'การเลือกตั้งระดับคณะ', start: '25 ก.ย. 2566, 09:00', end: '25 ก.ย. 2566, 17:00' },
+        { id: 2, name: 'การเลือกตั้งสาขา DIT', type: 'การเลือกตั้งระดับสาขา', start: '26 ก.ย. 2566, 09:00', end: '26 ก.ย. 2566, 17:00' }
+    ];
 
     return (
         <div>
@@ -61,20 +69,22 @@ const ManageVotingList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>การเลือกตั้งคณะวิศวกรรมศาสตร์และเทคโนโลยี</td>
-                            <td>การเลือกตั้งระดับคณะ</td>
-                            <td>25 ก.ย. 2566, 09:00</td>
-                            <td>25 ก.ย. 2566, 17:00</td>
-                            <td><Link to="/edit-voting/1" className="edit-button">แก้ไข</Link></td>
-                        </tr>
-                        <tr>
-                            <td>การเลือกตั้งสาขา DIT</td>
-                            <td>การเลือกตั้งระดับสาขา</td>
-                            <td>26 ก.ย. 2566, 09:00</td>
-                            <td>26 ก.ย. 2566, 17:00</td>
-                            <td><Link to="/edit-voting/2" className="edit-button">แก้ไข</Link></td>
-                        </tr>
+                        {votingData.map((voting) => (
+                            <tr key={voting.id}>
+                                <td>{voting.name}</td>
+                                <td>{voting.type}</td>
+                                <td>{voting.start}</td>
+                                <td>{voting.end}</td>
+                                <td>
+                                    <button
+                                        className="edit-button"
+                                        onClick={() => handleEdit(voting)}
+                                    >
+                                        แก้ไข
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
                 <div className="add-voting-button">

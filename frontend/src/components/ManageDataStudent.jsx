@@ -4,17 +4,22 @@ import DigitalClock from '../components/DigitalClock';
 import { IconButton, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import '../components-style/ManageDataStudent.css';
 
 const ManageDataStudent = () => {
     const [students, setStudents] = useState([]);
+    const [electionType, setElectionType] = useState('');
     const [open, setOpen] = useState(false);
     const [newStudent, setNewStudent] = useState({ name: '', studentId: '', faculty: '', major: '' });
+    const navigate = useNavigate();
+
 
     const handleImportExcel = (event) => {
         const file = event.target.files[0];
         const reader = new FileReader();
+
 
         reader.onload = (event) => {
             const binaryStr = event.target.result;
@@ -70,19 +75,31 @@ const ManageDataStudent = () => {
         handleClose();
     };
 
+    const handleConfirm = () => {
+        // ตรวจสอบว่ามีการเลือก electionType หรือไม่
+        if (electionType) {
+            navigate('/admin');
+        } else {
+            // หากไม่มีการเลือก electionType แสดงการแจ้งเตือน
+            alert('กรุณาเลือกการเลือกตั้ง');
+        }
+    };
+
     return (
         <>
             <NavbarAdmin />
             <DigitalClock />
             <div>
-                <div className='VTitle'>
-                    <img
-                        loading="lazy"
-                        src="https://krishplayschool.com/images/icons/graduation.svg"
-                        className="VImg"
-                        alt=""
-                    />
-                    <div className='Votename'><h1>จัดการข้อมูลนักศึกษา</h1></div>
+                <div className='election-form-container'>
+                    <div className='VTitle'>
+                        <img
+                            loading="lazy"
+                            src="https://krishplayschool.com/images/icons/graduation.svg"
+                            className="VImg"
+                            alt=""
+                        />
+                        <div><h1>จัดการข้อมูลนักศึกษา</h1></div>
+                    </div>
                 </div>
                 <div className='VTitle'>
                     <input
@@ -102,6 +119,19 @@ const ManageDataStudent = () => {
                             นำเข้าข้อมูลนักศึกษา
                         </Button>
                     </label>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="electionType">เลือกการเลือกตั้ง:</label>
+                    <select
+                        id="electionType"
+                        value={electionType}
+                        onChange={(e) => setElectionType(e.target.value)}
+                        required
+                    >
+                        <option value="">เลือก</option>
+                        <option value="1">การเลือกตั้งคณะวิศวกรรมศาสตร์และเทคโนโลยี</option>
+                        <option value="2">การเลือกตั้งสาขา DIT</option>
+                    </select>
                 </div>
                 <TableContainer component={Paper} style={{ maxHeight: 400, overflowY: 'auto' }}>
                     <Table>
@@ -141,6 +171,9 @@ const ManageDataStudent = () => {
                     >
                         เพิ่มรายชื่อสมาชิก
                     </Button>
+                </div>
+                <div className="form-group button">
+                    <button type="submit" className="btn btn-success" onClick={handleConfirm}>ยืนยัน</button>
                 </div>
             </div>
 

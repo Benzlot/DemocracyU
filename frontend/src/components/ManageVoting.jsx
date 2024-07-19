@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
@@ -7,6 +7,7 @@ import '../components-style/AdminDashboard.css';
 import '../components-style/ManageVoting.css';
 import '../components-style/ManageDataStudent.css';
 import DigitalClock from './DigitalClock';
+import { addElection } from '../services/electionService';
 
 const ManageVoting = () => {
     const { account, userData, logout } = useContext(AuthContext);
@@ -15,6 +16,7 @@ const ManageVoting = () => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const handleStartDateChange = (e) => {
         setStartDate(e.target.value);
@@ -34,11 +36,9 @@ const ManageVoting = () => {
         }
     };
 
-    const handleConfirm = () => {
-        // Handle saving data or any other logic here
-
-        // Navigate back to ManageVotingList after saving
-        navigate('.../');
+    const handleConfirm = async () => {
+        await addElection(electionName,electionType,startDate,endDate)
+        navigate('/manage-voting-list');
     };
 
     const handleSubmit = (e) => {

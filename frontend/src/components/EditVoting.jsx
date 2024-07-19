@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link,useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
@@ -7,28 +7,36 @@ import '../components-style/AdminDashboard.css';
 import '../components-style/ManageVoting.css';
 import '../components-style/ManageDataStudent.css';
 import DigitalClock from '../components/DigitalClock';
+import { updateElection, deleteElection, getElectionbyName } from '../services/electionService';
+
 
 const EditVoting = () => {
     const { account, userData, logout } = useContext(AuthContext);
-    const { id } = useParams();
-    const location = useLocation();
+    const [electionName, setElectionName] = useState('');
+    const [electionType, setElectionType] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    // Extract the voting data from location.state
-    const { voting } = location.state || {};
-
-    const [electionName, setElectionName] = useState(voting ? voting.name : '');
-    const [electionType, setElectionType] = useState(voting ? voting.type : '');
-    const [startDate, setStartDate] = useState(voting ? voting.start : '');
-    const [endDate, setEndDate] = useState(voting ? voting.end : '');
-    const [error, setError] = useState('');
+    async function fetchElection() {
+        try {
+          const rawData = await getElectionbyName();
+          console.log(rawData)
+          if (Array.isArray(rawData)) {
+            const data = mapElection(rawData);
+              setElection(data);
+          } else {
+            console.error("Expected an array but got:", rawData);
+          }
+        } catch (error) {
+          console.error("Failed to fetch election:", error);
+        }
+      }
 
     useEffect(() => {
-        // Handle potential fallback if voting is undefined
-        if (!voting) {
-            navigate('/manage-voting-list');
-        }
-    }, [voting, navigate]);
+        fetchElection();
+    }, []);
 
     const handleStartDateChange = (e) => {
         setStartDate(e.target.value);
@@ -48,14 +56,16 @@ const EditVoting = () => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle form submission logic here
+        await updateElection(electionName,electionType,startDate,endDate)
+        navigate('/manage-voting-list')
     };
 
-    const handleEmergencyClose = () => {
-        // Handle emergency close logic here
+    const handleEmergencyClose = async () => {
+        await deleteElection(electionName)
         console.log("Emergency close triggered");
+        navigate('/manage-voting-list')
     };
 
     return (
@@ -137,7 +147,7 @@ const EditVoting = () => {
                     </div>
                     {error && <div className="error">{error}</div>}
                     <div className="form-group button">
-                        <button type="submit" className="btn btn-success">ยืนยัน</button>
+                        <button type="submit" className="btn btn-success"onClick={() => handleSubmit}>ยืนยัน</button>
                         <button type="button" className="btn btn-danger" onClick={() => navigate('/manage-voting-list')}>ยกเลิก</button>
                     </div>
                     <div className="form-group button">

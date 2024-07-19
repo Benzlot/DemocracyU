@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect,useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../components-style/Navbar.css';
@@ -8,11 +8,42 @@ import '../components-style/ManageVoting.css';
 import '../components-style/ManageDataStudent.css';
 import DigitalClock from '../components/DigitalClock';
 import '../components-style/ManageVotingList.css';
+import { getElection } from '../services/electionService';
 
 const ManageVotingList = () => {
     const { account, userData, logout } = useContext(AuthContext);
     const navigate = useNavigate();
+    const [election, setElection] = useState([]);
+    
+    async function fetchElection() {
+        try {
+          const rawData = await getElection();
+          console.log(rawData)
+          if (Array.isArray(rawData)) {
+            const data = mapElection(rawData);
+              setElection(data);
+          } else {
+            console.error("Expected an array but got:", rawData);
+          }
+        } catch (error) {
+          console.error("Failed to fetch election:", error);
+        }
+      }
 
+    useEffect(() => {
+        fetchElection();
+    }, []);
+    
+    const mapElection = (rawData) => {
+        return rawData.map((data,index) => ({
+          id: index+1, 
+          name: data.election_name, 
+          type: data.election_type,
+          start: data.election_start,
+          end: data.election_end,
+        }));
+      };
+      
     const handleNavigate = (path) => {
         navigate(path);
     };
@@ -69,7 +100,7 @@ const ManageVotingList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {votingData.map((voting) => (
+                        {election.map((voting) => (
                             <tr key={voting.id}>
                                 <td>{voting.name}</td>
                                 <td>{voting.type}</td>

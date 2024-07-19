@@ -1,15 +1,24 @@
 // controllers/candidateController.js
-const Candidate = require('../models/candidateModel');
+const createCandidate = require('../models/candidateModel');
+const Election = require('../models/electionModel');
+const { checkNotEmpty ,checkIfEmpty } = require('../Service/commonService');
 const mongoose = require('mongoose');
 
 async function getCandidates  (req, res) {
   try {
+
+    const { election_name } = req.body
+
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       dbName: 'DemocracyU',
     });
     console.log('MongoDB connected');
+
+    let [Elections] = await Election.find({election_name : election_name});
+
+    let Candidate = createCandidate(Elections.candidate_table);
       
     let candidates = await Candidate.find();
 
@@ -30,24 +39,34 @@ async function addCandidate (req, res) {
       dbName: 'DemocracyU',
     });
 
-    let {id,name,student_id,faculty,branch,vision} = req.body
+    const { election_name, candidate_list } = req.body
 
-    let addedCandidate = new Candidate({  
-      id: id?.toString(),
-      name: name?.toString(),
-      student_id: student_id?.toString(),
-      faculty: faculty?.toString(),
-      branch: branch?.toString(),
-      vision: vision?.toString(),
-    });
+    let Elections = await Election.findOne({election_name : election_name});
+    checkIfEmpty(Elections, "Election not found")
 
-    await addedCandidate.save()
 
-    let candidates = await Candidate.find();
+    let Candidate = createCandidate(Elections.candidate_table);
 
-    res.status(200).json(candidates);
+    for (let index = 0; index < candidate_list.length; index++) {
+      const Candidates = candidate_list[index];
+      const candidate = await Candidate.findOne({student_id: candidate_list[index].student_id})
+      if(checkNotEmpty(candidate)){
+        const newCandidate = new Candidate({
+            id: index.toString(),
+            ...Candidates,
+        });
+        await newCandidate.save();
+        console.log(`Candidate ${Candidates.name} (index ${index}) inserted`);
+      }else{
+        console.log(`Candidate ${Candidates.name} (index ${index}) skip`);
+      }
+  }
+
+
+    res.status(200).json({message: 'addCandidate Success'});
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch candidates' });
+    console.log(error)
+    res.status(500).json({ error: error.message || 'Failed to fetch candidates' });
   } finally {
     mongoose.connection.close();
   }

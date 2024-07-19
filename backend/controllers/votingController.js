@@ -1,7 +1,12 @@
-// controllers/votingController.js
-// const { blockSchema } = require('../models/votingModel');
+
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const createCandidate = require('../models/candidateModel');
+const createVoteResult = require('../models/votingModel')
+const createVoter = require('../models/voterModel');
+const Election = require('../models/electionModel');
+const { checkIfEmpty, checkIfStringIsZero } = require('../Service/commonService');
+
 
 async function getVotes (req, res) {
   try {
@@ -14,48 +19,66 @@ async function getVotes (req, res) {
 
 async function vote (req, res) {
   try {
-    const { candidate_Id, username, email } = req.body;
+    const { election_name ,candidate_Id, name, mail } = req.body;
 
-    // await mongoose.connect(process.env.MONGODB_URI, {
-    //   useNewUrlParser: true,
-    //   useUnifiedTopology: true,
-    //   dbName: 'DemocracyU',
-    // });
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      dbName: 'DemocracyU',
+    });
+
+    let Elections = await Election.findOne({election_name : election_name});
+    console.log(Elections)
+    //check election exist
+    checkIfEmpty(Elections, "Election not found")
+    //check candidate exist
+    let Candidate = createCandidate(Elections.candidate_table);
+    let candidates = await Candidate.findOne({id : candidate_Id})
+    console.log(candidates)
+    checkIfEmpty(candidates, "Candidate not found")
+    //check 
+    let Voter = createVoter(Elections.voter_table)
+    let voters = await Voter.findOne({mail : mail})
+    console.log(voters)
+    checkIfStringIsZero(voters.status, "Voter has been voted")
+
+
+    let VoteResult = createVoteResult(Elections.voteResult_table)
     
     const blockchain = new Blockchain();
-    await blockchain.initialize();
-
-    const hashed_data = crypto.createHash('sha256').update(username+email).digest('hex');
-
+    await blockchain.initialize(VoteResult);
+    
+    const hashed_data = crypto.createHash('sha256').update(name+mail).digest('hex');
+    
     await blockchain.addBlock(candidate_Id, hashed_data)
+
+    //Add edit status user after vote <-- ปรับเป้นผู้ไม่สิทธิ์โหวตด้วย
+    await Voter.updateOne(
+      {mail : mail},
+      { $set: { status: '1' } }
+    )
     
     res.status(200).json({ message: 'Vote cast successfully' });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to cast vote' });
+    console.log(error)
+    res.status(500).json({ error: error.message || 'Failed to cast vote' });
   }finally{
     mongoose.connection.close();
   }
 };
 
-const blockSchema = new mongoose.Schema({
-  index: Number,
-  candidate_id: String,
-  hashed_data: String,
-  previous_hash: String,
-  nonce: String,
-  hash: String
-}, { timestamps: true }); // Adding timestamps for createdAt and updatedAt
-
-const BlockchainModel = mongoose.model('voteresult', blockSchema); 
 
 class Blockchain {
   constructor() {
       this.chain = [];
       this.difficulty = 2;
+      this.model = "";
   }
 
-  async initialize() {
+  async initialize(model) {
     try {
+        mongoose.connection.close();
+
         await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
@@ -63,6 +86,7 @@ class Blockchain {
         });
         console.log('MongoDB Connected');
 
+        this.model = model;
         // Initialize blockchain operations
         await this.createGenesisBlock();
         // Other initialization tasks can be added here
@@ -74,7 +98,7 @@ class Blockchain {
 }
 
   async createGenesisBlock() {
-      const genesisBlock = await BlockchainModel.findOne({ index: 0 });
+      const genesisBlock = await this.model.findOne({ index: 0 });
 
       if (!genesisBlock) {
           const newBlock = this.createBlock(0, "Genesis Candidate ID", "Genesis Hashed Data", "0");
@@ -89,7 +113,7 @@ class Blockchain {
   createBlock(index, candidate_id, hashed_data, previous_hash) {
       const nonce = '0';
       const hash = this.calculateHash(index, candidate_id, hashed_data, previous_hash, nonce);
-      return new BlockchainModel({ index, candidate_id, hashed_data, previous_hash, nonce, hash });
+      return new this.model({ index, candidate_id, hashed_data, previous_hash, nonce, hash });
   }
 
   calculateHash(index, candidate_id, hashed_data, previous_hash, nonce) {
@@ -104,7 +128,7 @@ class Blockchain {
   }
 
   async getLatestBlock() {
-      return await BlockchainModel.findOne().sort({ index: -1 });
+      return await this.model.findOne().sort({ index: -1 });
   }
 
   async addBlock(candidate_id, hashed_data) {

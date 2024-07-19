@@ -16,14 +16,29 @@ import ManageDataCandidate from './components/ManageDataCandidate';
 import ManageVoting from './components/ManageVoting';
 import ManageVotingList from './components/ManageVotingList';
 import EditVoting from './components/EditVoting';
+import ClipLoader from "react-spinners/ClipLoader"; // Import ClipLoader
 
 function App() {
-  const { account, userData, isAdmin } = useContext(AuthContext);
+  const { account, userData, isAdmin, isLoading } = useContext(AuthContext);
   const location = useLocation();
 
-  if (account === undefined) {
-    // Render loading state or placeholder while initializing context
-    return <div>Loading...</div>;
+  if (isLoading) {
+    // Render spinner while loading
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh'
+      }}>
+        <ClipLoader
+          color="#ff0000"
+          cssOverride={{}}
+          size={100}
+          speedMultiplier={2}
+        />
+      </div>
+    );
   }
 
   // Define paths where Navbar should not be shown

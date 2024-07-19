@@ -11,4 +11,4 @@ const CandidateSchema = new mongoose.Schema({
   // Add other fields as needed
 });
 
-module.exports = mongoose.model('Candidate', CandidateSchema);
+module.exports = (table_name) =>{return mongoose.model(table_name, CandidateSchema);}

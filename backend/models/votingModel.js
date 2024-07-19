@@ -1,13 +1,13 @@
 // Candidate.js (mongoose model example)
 const mongoose = require('mongoose');
 
-const VoteSchema = new mongoose.Schema({
-  index: mongoose.Schema.Types.Decimal128,
+const VoteResultSchema = new mongoose.Schema({
+  index: Number,
   candidate_id: String,
   hashed_data: String,
   previous_hash: String,
-  nonce: String
-  // Add other fields as needed
-});
+  nonce: String,
+  hash: String
+}, { timestamps: true });
 
-module.exports = mongoose.model('vote', VoteSchema);
+module.exports = (table_name) => { return mongoose.model(table_name, VoteResultSchema)};

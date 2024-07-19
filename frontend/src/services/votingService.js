@@ -7,8 +7,9 @@ export const getVotes = async () => {
   return response.data;
 };
 
-export const castVote = async (candidate_Id, username, email) => {
+export const castVote = async (election_name ,candidate_Id, username, email) => {
   const response = await axios.post(`${API_URL}/vote`, { 
+      election_name : election_name,
       candidate_Id : candidate_Id, 
       username : username, 
       email :email 

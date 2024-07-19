@@ -24,8 +24,10 @@
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.25.0",
+    "react-spinners": "^0.14.1",
     "react-spring": "^9.7.3",
     "socket.io-client": "^4.7.5",
+    "sweetalert2": "^11.12.3",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

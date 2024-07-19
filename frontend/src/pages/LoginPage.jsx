@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { PublicClientApplication, EventType } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { msalConfig, loginRequest } from "../config/msalConfig";
@@ -25,7 +25,7 @@ msalInstance.addEventCallback((event) => {
 const LoginButton = () => {
   const { account, userData, login } = useContext(AuthContext);
   const navigate = useNavigate();
-  //userData.isAdmin : true == Admin : false != Admin
+
   useEffect(() => {
     if (account) {
       if (userData.isAdmin) {

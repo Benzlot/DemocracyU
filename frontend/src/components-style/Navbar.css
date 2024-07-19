@@ -118,15 +118,14 @@ html {
 }
 
 .button-login {
-    display: block;
-    margin: 20px auto;
     padding: 25px 75px;
     background-color: #8B0000;
     color: white;
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 2vw;
+    display: flex;
 }
 
 .login-container {
@@ -135,10 +134,13 @@ html {
     align-items: center;
 }
 
-.button-login .login-icon {
-    width: 30px;
-    height: 30px;
-    margin-right: 10px;
+.login-icon {
+    width: 3vw;
+    height: 3vw;
+    margin-right: 3vw;
+}
+.button-login {
+margin-top: 5vw;
 }
 
 .logout-button {

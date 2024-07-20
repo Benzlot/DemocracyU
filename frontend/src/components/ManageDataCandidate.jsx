@@ -5,6 +5,7 @@ import { IconButton, Button, Table, TableBody, TableCell, TableContainer, TableH
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 import '../components-style/ManageDataStudent.css';
 import '../components-style/ManageVoting.css';
 
@@ -14,6 +15,39 @@ const ManageDataCandidate = () => {
     const [open, setOpen] = useState(false);
     const [newStudent, setNewStudent] = useState({ name: '', studentId: '', faculty: '', major: '', vision: '' });
     const navigate = useNavigate();
+
+    const handleImportExcel = (event) => {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+
+        reader.onload = (event) => {
+            const binaryStr = event.target.result;
+            const workbook = XLSX.read(binaryStr, { type: 'binary' });
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            // ตรวจสอบโครงสร้างของข้อมูลที่อ่านได้
+            console.log(data);
+
+            // ลบแถวหัวเรื่องออกและกรอง row ที่ไม่มีข้อมูล
+            const rows = data.slice(1).filter(row => row.some(cell => cell));
+
+            // ตั้งค่าข้อมูลใน state
+            const formattedData = rows.map(row => ({
+                name: row[0],
+                studentId: row[1],
+                faculty: row[2],
+                major: row[3],
+                vision: row[4]
+            }));
+
+            setStudents(formattedData);
+        };
+
+        reader.readAsBinaryString(file);
+    };
 
     const handleDelete = (index) => {
         const updatedStudents = students.filter((_, i) => i !== index);
@@ -92,6 +126,25 @@ const ManageDataCandidate = () => {
                         />
                         <div className='Votename'><h1>จัดการข้อมูลผู้ลงสมัคร</h1></div>
                     </div>
+                </div>
+                <div className='VTitle'>
+                    <input
+                        accept=".xlsx, .xls"
+                        style={{ display: 'none' }}
+                        id="upload-file"
+                        type="file"
+                        onChange={handleImportExcel}
+                    />
+                    <label htmlFor="upload-file">
+                        <Button
+                            variant="contained"
+                            component="span"
+                            style={{ margin: 20, backgroundColor: '#A03939' }}
+                            startIcon={<img src="https://cdn-icons-png.flaticon.com/512/11039/11039795.png" alt="icon" style={{ width: 20, marginRight: 10 }} />}
+                        >
+                            นำเข้าข้อมูลนักศึกษา
+                        </Button>
+                    </label>
                 </div>
                 <div className="form-group">
                     <label htmlFor="electionType">เลือกการเลือกตั้ง:</label>

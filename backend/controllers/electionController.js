@@ -115,7 +115,7 @@ async function updateElection (req, res) {
     console.log(election)
     checkIfEmpty(election, "Election not found")
 
-    let result = await election.updateOne(
+    let result = await Election.updateOne(
       { election_name : name},
       { $set: { 
         election_type: type ,

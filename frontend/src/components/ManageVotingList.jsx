@@ -1,4 +1,4 @@
-import React, { useContext, useEffect,useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../components-style/Navbar.css';
@@ -9,56 +9,49 @@ import '../components-style/ManageDataStudent.css';
 import DigitalClock from '../components/DigitalClock';
 import '../components-style/ManageVotingList.css';
 import { getElection } from '../services/electionService';
+import moment from 'moment';
 
 const ManageVotingList = () => {
     const { account, userData, logout } = useContext(AuthContext);
     const navigate = useNavigate();
     const [election, setElection] = useState([]);
-    
+
     async function fetchElection() {
         try {
-          const rawData = await getElection();
-          console.log(rawData)
-          if (Array.isArray(rawData)) {
-            const data = mapElection(rawData);
-              setElection(data);
-          } else {
-            console.error("Expected an array but got:", rawData);
-          }
+            const rawData = await getElection();
+            console.log(rawData);
+            if (Array.isArray(rawData)) {
+                const data = mapElection(rawData);
+                setElection(data);
+            } else {
+                console.error("Expected an array but got:", rawData);
+            }
         } catch (error) {
-          console.error("Failed to fetch election:", error);
+            console.error("Failed to fetch election:", error);
         }
-      }
+    }
 
     useEffect(() => {
         fetchElection();
     }, []);
-    
+
     const mapElection = (rawData) => {
-        return rawData.map((data,index) => ({
-          id: index+1, 
-          name: data.election_name, 
-          type: data.election_type,
-          start: data.election_start,
-          end: data.election_end,
+        return rawData.map((data, index) => ({
+            id: index + 1,
+            name: data.election_name,
+            type: data.election_type,
+            start: moment(data.election_start).format('DD/MM/YYYY HH:mm'),
+            end: moment(data.election_end).format('DD/MM/YYYY HH:mm'),
         }));
-      };
-      
+    };
+
     const handleNavigate = (path) => {
         navigate(path);
     };
 
     const handleEdit = (voting) => {
-        navigate(`/edit-voting/${voting.id}`
-            , { state: { voting } }
-        );
-        // console.log(voting)
+        navigate(`/edit-voting/${voting.id}`, { state: { voting } });
     };
-
-    const votingData = [
-        { id: 1, name: 'การเลือกตั้งคณะวิศวกรรมศาสตร์และเทคโนโลยี', type: 'การเลือกตั้งระดับคณะ', start: '25 ก.ย. 2566, 09:00', end: '25 ก.ย. 2566, 17:00' },
-        { id: 2, name: 'การเลือกตั้งสาขา DIT', type: 'การเลือกตั้งระดับสาขา', start: '26 ก.ย. 2566, 09:00', end: '26 ก.ย. 2566, 17:00' }
-    ];
 
     return (
         <div>
@@ -132,3 +125,7 @@ const ManageVotingList = () => {
 };
 
 export default ManageVotingList;
+
+
+
+

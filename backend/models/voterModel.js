@@ -6,7 +6,7 @@ const VoterSchema = new mongoose.Schema({
   student_id: String,
   name: String,
   faculty: String,
-  branch: String,
+  major: String,
   status : String,
 });
 

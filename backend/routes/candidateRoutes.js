@@ -3,7 +3,7 @@ const express = require('express');
 const { getCandidates, addCandidate } = require('../controllers/candidateController');
 const router = express.Router();
 
-router.get('/', getCandidates);
+router.post('/', getCandidates);
 
 router.post('/add', addCandidate)
 

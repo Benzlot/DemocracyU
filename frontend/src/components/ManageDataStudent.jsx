@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import NavbarAdmin from '../components/NavbarAdmin';
 import DigitalClock from '../components/DigitalClock';
 import { IconButton, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
@@ -7,6 +7,8 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import '../components-style/ManageDataStudent.css';
+import { getElection } from '../services/electionService';
+import { addVoter } from '../services/voterService';
 
 const ManageDataStudent = () => {
     const [students, setStudents] = useState([]);
@@ -14,7 +16,31 @@ const ManageDataStudent = () => {
     const [open, setOpen] = useState(false);
     const [newStudent, setNewStudent] = useState({ name: '', studentId: '', faculty: '', major: '' });
     const navigate = useNavigate();
+    const [election, setElection] = useState([]);
+    
+    async function fetchElection() {
+        try {
+          const rawData = await getElection();
+          console.log(rawData)
+          const allElection = rawData.map((election)=>{
+            return election.election_name;
+          })
+          console.log(allElection)
+          setElection(allElection); 
+        //   if (Array.isArray(rawData)) {
+        //     const data = mapElection(rawData);
+        //       setElection(data);
+        //   } else {
+        //     console.error("Expected an array but got:", rawData);
+        //   }
+        } catch (error) {
+          console.error("Failed to fetch election:", error);
+        }
+      }
 
+    useEffect(() => {
+        fetchElection();
+    }, []);
 
     const handleImportExcel = (event) => {
         const file = event.target.files[0];
@@ -75,15 +101,32 @@ const ManageDataStudent = () => {
         handleClose();
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         // ตรวจสอบว่ามีการเลือก electionType หรือไม่
         if (electionType) {
-            navigate('/admin');
+            const studentList = createStudent();
+            const electionName = election[electionType];
+            await addVoter(electionName,studentList);
+            //Sweetalert add
+            // navigate('/admin');
+            console.log(electionType);
         } else {
             // หากไม่มีการเลือก electionType แสดงการแจ้งเตือน
             alert('กรุณาเลือกการเลือกตั้ง');
         }
     };
+
+    const createStudent =()=>{
+        return students.map((student)=>(
+            {
+            student_id: student.studentId,
+            name: student.name,
+            faculty:student.faculty,
+            major:student.major,
+            mail: student.studentId+"@stu.pim.ac.th"
+            }
+        ))
+    }
 
     return (
         <>
@@ -129,8 +172,11 @@ const ManageDataStudent = () => {
                         required
                     >
                         <option value="">เลือก</option>
-                        <option value="1">การเลือกตั้งคณะวิศวกรรมศาสตร์และเทคโนโลยี</option>
-                        <option value="2">การเลือกตั้งสาขา DIT</option>
+                        {
+                            election.map((name, index)=>(
+                                <option value={index}>{name}</option> 
+                            ))
+                        }
                     </select>
                 </div>
                 <TableContainer component={Paper} style={{ maxHeight: 400, overflowY: 'auto' }}>

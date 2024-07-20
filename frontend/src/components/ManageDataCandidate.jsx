@@ -5,6 +5,7 @@ import { IconButton, Button, Table, TableBody, TableCell, TableContainer, TableH
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 import '../components-style/ManageDataStudent.css';
 import '../components-style/ManageVoting.css';
 import { getElection } from '../services/electionService';
@@ -62,14 +63,15 @@ const ManageDataCandidate = () => {
                 studentId: row[1],
                 faculty: row[2],
                 major: row[3],
+                vision: row[4]
             }));
-
             setCandidates(formattedData);
         };
 
         reader.readAsBinaryString(file);
     };
     
+
     const handleDelete = (index) => {
         const updatedCandidates = candidates.filter((_, i) => i !== index);
         setCandidates(updatedCandidates);

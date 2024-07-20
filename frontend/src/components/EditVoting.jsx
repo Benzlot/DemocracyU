@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Link,useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
@@ -8,6 +8,7 @@ import '../components-style/ManageVoting.css';
 import '../components-style/ManageDataStudent.css';
 import DigitalClock from '../components/DigitalClock';
 import { updateElection, deleteElection, getElectionbyName } from '../services/electionService';
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 const EditVoting = () => {
@@ -17,22 +18,23 @@ const EditVoting = () => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     let state = location.state
 
     async function fetchElection(state) {
         try {
-          const rawData = await getElectionbyName(state.voting.name);
-          setElectionName(rawData.election_name);
-          setElectionType(rawData.election_type);
-          setStartDate(rawData.election_start);
-          setEndDate(rawData.election_end);
-          console.log(rawData)
+            const rawData = await getElectionbyName(state.voting.name);
+            setElectionName(rawData.election_name);
+            setElectionType(rawData.election_type);
+            setStartDate(rawData.election_start);
+            setEndDate(rawData.election_end);
+            console.log(rawData)
         } catch (error) {
-          console.error("Failed to fetch election:", error);
+            console.error("Failed to fetch election:", error);
         }
-      }
+    }
 
     useEffect(() => {
         fetchElection(state);
@@ -56,18 +58,28 @@ const EditVoting = () => {
             setError('');
         }
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await updateElection(electionName,electionType,startDate,endDate)
-        navigate('/manage-voting-list')
+        setLoading(true);
+        try {
+            await updateElection(electionName, electionType, startDate, endDate);
+            navigate('/manage-voting-list');
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleEmergencyClose = async () => {
-        await deleteElection(electionName)
-        console.log("Emergency close triggered");
-        navigate('/manage-voting-list')
+        const confirmed = window.confirm(`แน่ใจที่จะปิด ${electionName} จริงหรอ ${account.name}`);
+        if (confirmed) {
+            await deleteElection(electionName);
+            console.log("Emergency close triggered");
+            navigate('/manage-voting-list');
+        }
     };
+
 
     return (
         <div>
@@ -148,7 +160,8 @@ const EditVoting = () => {
                     </div>
                     {error && <div className="error">{error}</div>}
                     <div className="form-group button">
-                        <button type="submit" className="btn btn-success"onClick={() => handleSubmit}>ยืนยัน</button>
+                        <button type="submit" className="btn btn-success" disabled={loading}>
+                            {loading ? <CircularProgress size={24} /> : 'ยืนยัน'}</button>                        
                         <button type="button" className="btn btn-danger" onClick={() => navigate('/manage-voting-list')}>ยกเลิก</button>
                     </div>
                     <div className="form-group button">

@@ -21,3 +21,11 @@ export const addCandidate = async (election_name, candidate_list) => {
     });
   return response.data;
 };
+
+export const deleteCandidate = async (election_name,student_id) => {
+  const response = await axios.post(`${API_URL}/delete`, { 
+      election_name : election_name,
+      student_id : student_id
+    });
+  return response.data;
+};

@@ -5,12 +5,12 @@ import { IconButton, Button, Table, TableBody, TableCell, TableContainer, TableH
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useNavigate } from 'react-router-dom';
-import * as XLSX from 'xlsx';
 import '../components-style/ManageDataStudent.css';
 import '../components-style/ManageVoting.css';
 import { getElection } from '../services/electionService';
-import { addCandidate } from '../services/candidateService';
+import { addCandidate , getCandidates , deleteCandidate } from '../services/candidateService';
 import * as XLSX from 'xlsx';
+import Swal from 'sweetalert2';
 
 const ManageDataCandidate = () => {
     const [candidates, setCandidates] = useState([]);
@@ -63,18 +63,24 @@ const ManageDataCandidate = () => {
                 studentId: row[1],
                 faculty: row[2],
                 major: row[3],
-                vision: row[4]
             }));
+
             setCandidates(formattedData);
         };
 
         reader.readAsBinaryString(file);
     };
     
-
-    const handleDelete = (index) => {
-        const updatedCandidates = candidates.filter((_, i) => i !== index);
-        setCandidates(updatedCandidates);
+    const handleDelete = async (index) => {
+        if (electionType) {
+            const electionName = election[electionType]
+            await deleteCandidate(electionName, candidates[index].studentId)
+            console.log("delete pass")
+            const updatedCandidates = candidates.filter((_, i) => i !== index);
+            setCandidates(updatedCandidates);
+        }else{
+            alert('กรุณาเลือกการเลือกตั้ง');
+        }
     };
 
     const handleClickOpen = () => {
@@ -105,8 +111,15 @@ const ManageDataCandidate = () => {
         if (electionType) {
             const candidateList = createCandidate();
             const electionName = election[electionType];
-            await addCandidate(electionName, candidateList)
-            // navigate('/admin');
+            await addCandidate(electionName, candidateList);
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Your work has been saved",
+                showConfirmButton: false,
+                timer: 1500
+              });
+            navigate('/admin');
         } else {
             // หากไม่มีการเลือก electionType แสดงการแจ้งเตือน
             alert('กรุณาเลือกการเลือกตั้ง');
@@ -116,7 +129,7 @@ const ManageDataCandidate = () => {
     const createCandidate =()=>{
         return candidates.map((candidate)=>(
             {
-            student_id: candidate.candidateId,
+            student_id: candidate.studentId,
             name: candidate.name,
             faculty:candidate.faculty,
             major:candidate.major,
@@ -124,6 +137,29 @@ const ManageDataCandidate = () => {
             }
         ))
     }
+
+    const handelDropdownChange = async () =>{
+        if(electionType){
+            const electionName = election[electionType]
+            const candidatesList = await getCandidates(electionName);
+            const candidateListMapped = candidatesList.map((candidate)=>(
+                {   
+                    name: candidate.name, 
+                    studentId: candidate.student_id, 
+                    faculty: candidate.faculty, 
+                    major: candidate.major,
+                    vision: candidate.vision
+                }
+            ))
+            setCandidates(candidateListMapped);
+        }else{
+            setCandidates([])
+        }
+    }
+
+    useEffect(()=>{
+        handelDropdownChange()
+    },[electionType])
     // ฟังก์ชันสำหรับบันทึกข้อมูล (ตัวอย่าง)
     // const saveData = async (data) => {
     //     try {
@@ -176,10 +212,10 @@ const ManageDataCandidate = () => {
                         <Button
                             variant="contained"
                             component="span"
-                            style={{ margin: 20, backgroundColor: '#A03939' }}
-                            startIcon={<img src="https://cdn-icons-png.flaticon.com/512/11039/11039795.png" alt="icon" style={{ width: 20, marginRight: 10 }} />}
+                            style={{ minWidth: 250, backgroundColor: '#A03939', alignItems: 'center',justifyContent: 'center' }}
+                            startIcon={<img src="https://cdn-icons-png.flaticon.com/512/11039/11039795.png" alt="icon" style={{ maxWidth: 70}} />}
                         >
-                            นำเข้าข้อมูลนักศึกษา
+                            <span>นำเข้าข้อมูลนักศึกษา</span>
                         </Button>
                     </label>
                 </div>

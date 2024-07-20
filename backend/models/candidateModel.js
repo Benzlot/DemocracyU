@@ -6,9 +6,9 @@ const CandidateSchema = new mongoose.Schema({
   name: String,
   student_id: String,
   faculty: String,
-  branch: String,
+  major: String,
   vision: String,
-  // Add other fields as needed
+  election_name :String,
 });
 
-module.exports = (table_name) =>{return mongoose.model(table_name, CandidateSchema);}
+module.exports = mongoose.model("candidate", CandidateSchema)

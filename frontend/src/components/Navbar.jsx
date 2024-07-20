@@ -35,7 +35,6 @@ const Navbar = () => {
         <div className="dashboard-navbar">
           <Link to="/directory" className="nav-link">ทำเนียบนักศึกษา</Link>
           <Link to="/results" className="nav-link">ผลการเลือกตั้ง</Link>
-          <Link to="/evaluationStudent" className="nav-link">ประเมินผล</Link>
           <Link to="/evaluationPage" className="nav-link">ประเมินเว็ปไซต์</Link>
         </div>
       )}

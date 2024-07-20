@@ -1,6 +1,6 @@
 // controllers/candidateController.js
 const Election = require('../models/electionModel');
-const createVoter = require('../models/voterModel');
+const Voter = require('../models/voterModel');
 const { checkNotEmpty,checkIfEmpty } = require('../Service/commonService');
 const mongoose = require('mongoose');
 
@@ -14,17 +14,13 @@ async function getVoter (req, res) {
       useUnifiedTopology: true,
       dbName: 'DemocracyU',
     });
-    console.log('MongoDB connected');
       
     let Elections = await Election.findOne({election_name : election_name});
     checkIfEmpty(Elections, "Election not found")
 
-    const Voter = createVoter(Elections.voter_table);
-
     let voters = await Voter.find()
     
     console.log("voters ==> ",voters)
-    
     res.status(200).json(voters);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch voters' });
@@ -47,34 +43,67 @@ async function addVoter (req, res) {
     let Elections = await Election.findOne({election_name : election_name});
     checkIfEmpty(Elections, "Election not found")
 
+    let result = []
+
     const Voter = createVoter(Elections.voter_table);
 
     for (const student of student_list) {
       const voters = await Voter.findOne({mail: student.mail})
       if(checkNotEmpty(voters)){
-        const newVoter = new Voter({ ...student, status: '0' });
+        const newVoter = new Voter({ ...student,election_name: election_name ,status: '0' });
         await newVoter.save();
-        console.log(`Voter ${student.name} inserted`);
+        result.push({ message:`Voter ${student.name} inserted`});
       }else{
-        console.log(`Voter ${student.name} skiped`);
+        if(voters.election_name){
+          result.push({ message:`Voter ${student.name} is on ${voters.election_name} skiped`})
+        }else{
+          result.push({ message:`Voter ${student.name} skiped`});
+        }
       }
     }
 
-    // let voters = Voter.find()
 
-    res.status(200).json("Success");
+    res.status(200).json({result : result});
   } catch (error) {
     console.log(error)
-    res.status(500).json({ error: error.message ||'Failed to fetch voters' });
+    res.status(500).json({ error: error.message ||'Failed to add voters' });
   } finally {
     mongoose.connection.close();
   }
 
 }
 
+async function deleteVoterbyID (req, res){
+  try {
+  
+  let {election_name, student_id} = req.body
+
+  await mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    dbName: 'DemocracyU',
+  });
+     
+  let Elections = await Election.findOne({election_name : election_name});
+  checkIfEmpty(Elections, "Election not found")
+
+  const Voter = createVoter(Elections.voter_table);
+
+  const result = await Voter.deleteOne({ student_id : student_id})
+
+  res.status(200).json({result : result});
+} catch (error) {
+  console.log(error)
+  res.status(500).json({ error: error.message ||'Failed to delete voters' });
+} finally {
+  mongoose.connection.close();
+}
+}
+
 
 
 module.exports = {
   getVoter,
-  addVoter
+  addVoter,
+  deleteVoterbyID
 }

@@ -3,6 +3,8 @@ import { castVote } from '../services/votingService';
 import CandidateCard from './CandidateCard';
 import '../components-style/VotingPage.css';
 import { getCandidates } from '../services/candidateService';
+import '../components-style/Navbar.css';
+import '../components-style/UserDB.css';
 
 const VotingPage = () => {
   const [votes, setVotes] = useState([]);
@@ -50,6 +52,30 @@ const VotingPage = () => {
 
   return (
     <div>
+      <div>
+            <div className="navbar">
+                <div className="navbar-left">
+                    <div className="DemocracyU">
+                        <Link to="/" className="Title">DemocracyU</Link>
+                    </div>
+                </div>
+                <div className="navbar-right">
+                    {account ? (
+                        <>
+                            <div className="username">{account.name}</div>
+                            {userData && userData.photoUrl ? (
+                                <img src={userData.photoUrl} alt={`${account.name}'s profile`} className="profile-pic" />
+                            ) : (
+                                <div>No Profile Picture</div>
+                            )}
+                            <button onClick={logout} className="logout-button">Logout</button>
+                        </>
+                    ) : (
+                        <Link to="/login" className="login">Login</Link>
+                    )}
+                </div>
+            </div>
+            </div>
       <div className='VTitle'>
         <img
           loading="lazy"

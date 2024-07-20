@@ -1,5 +1,5 @@
 // controllers/candidateController.js
-const createCandidate = require('../models/candidateModel');
+const Candidate = require('../models/candidateModel');
 const Election = require('../models/electionModel');
 const { checkNotEmpty ,checkIfEmpty } = require('../Service/commonService');
 const mongoose = require('mongoose');
@@ -16,9 +16,8 @@ async function getCandidates  (req, res) {
     });
     console.log('MongoDB connected');
 
-    let [Elections] = await Election.find({election_name : election_name});
-
-    let Candidate = createCandidate(Elections.candidate_table);
+    let Election = await Election.findOne({election_name : election_name});
+    checkIfEmpty(Election, "Election not found")
       
     let candidates = await Candidate.find();
 
@@ -30,6 +29,31 @@ async function getCandidates  (req, res) {
     mongoose.connection.close();
   }
 };
+
+async function deleteCandidatebyID (req, res){
+  try {
+  
+  let {election_name, student_id} = req.body
+
+  await mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    dbName: 'DemocracyU',
+  });
+     
+  let Elections = await Election.findOne({election_name : election_name});
+  checkIfEmpty(Elections, "Election not found")
+
+  const result = await Candidate.deleteOne({ student_id : student_id})
+
+  res.status(200).json({result : result});
+} catch (error) {
+  console.log(error)
+  res.status(500).json({ error: error.message ||'Failed to delete voters' });
+} finally {
+  mongoose.connection.close();
+}
+}
 
 async function addCandidate (req, res) {
   try {
@@ -44,38 +68,41 @@ async function addCandidate (req, res) {
     let Elections = await Election.findOne({election_name : election_name});
     checkIfEmpty(Elections, "Election not found")
 
-
-    let Candidate = createCandidate(Elections.candidate_table);
+    let result = []
 
     for (let index = 0; index < candidate_list.length; index++) {
       const Candidates = candidate_list[index];
-      const candidate = await Candidate.findOne({student_id: candidate_list[index].student_id})
+      const candidate = await Candidate.findOne({student_id: Candidates.student_id})
       if(checkNotEmpty(candidate)){
         const newCandidate = new Candidate({
             id: index.toString(),
             ...Candidates,
+            election_name : election_name
         });
         await newCandidate.save();
-        console.log(`Candidate ${Candidates.name} (index ${index}) inserted`);
+        result.push({ message:`Candidate ${Candidates.name} (index ${index}) inserted`});
       }else{
-        console.log(`Candidate ${Candidates.name} (index ${index}) skip`);
+        if(candidate.election_name){
+          result.push({ message :`Candidate ${Candidates.name} (index ${index}) is on ${candidate.election_name} skip`});
+        }else{
+          result.push({ message :`Candidate ${Candidates.name} (index ${index}) skip`});
+        }
       }
   }
 
-
-    res.status(200).json({message: 'addCandidate Success'});
+    res.status(200).json({result: result});
   } catch (error) {
     console.log(error)
     res.status(500).json({ error: error.message || 'Failed to fetch candidates' });
   } finally {
     mongoose.connection.close();
   }
-
 }
 
 module.exports = {
   getCandidates,
-  addCandidate
+  addCandidate,
+  deleteCandidatebyID
 }
 
 // for add candidate

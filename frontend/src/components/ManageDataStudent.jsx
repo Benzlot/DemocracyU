@@ -8,14 +8,14 @@ import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import '../components-style/ManageDataStudent.css';
 import { getElection } from '../services/electionService';
-import { addVoter } from '../services/voterService';
+import { addVoter, getVoter, deleteVoter } from '../services/voterService';
+import Swal from 'sweetalert2'
 
 const ManageDataStudent = () => {
     const [students, setStudents] = useState([]);
     const [electionType, setElectionType] = useState('');
     const [open, setOpen] = useState(false);
     const [newStudent, setNewStudent] = useState({ name: '', studentId: '', faculty: '', major: '' });
-    const navigate = useNavigate();
     const [election, setElection] = useState([]);
     
     async function fetchElection() {
@@ -74,9 +74,16 @@ const ManageDataStudent = () => {
         reader.readAsBinaryString(file);
     };
 
-    const handleDelete = (index) => {
-        const updatedStudents = students.filter((_, i) => i !== index);
-        setStudents(updatedStudents);
+    const handleDelete = async(index) => {
+        if (electionType) {
+            const electionName = election[electionType]
+            await deleteVoter(electionName, students[index].studentId)
+
+            const updatedStudents = students.filter((_, i) => i !== index);
+            setStudents(updatedStudents);
+        }else{
+            alert('กรุณาเลือกการเลือกตั้ง');
+        }
     };
 
     const handleClickOpen = () => {
@@ -108,13 +115,42 @@ const ManageDataStudent = () => {
             const electionName = election[electionType];
             await addVoter(electionName,studentList);
             //Sweetalert add
-            // navigate('/admin');
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "ดำเนินการเสร็จสิ้น",
+                showConfirmButton: false,
+                timer: 1500
+              });
+            navigate('/admin');
             console.log(electionType);
         } else {
             // หากไม่มีการเลือก electionType แสดงการแจ้งเตือน
             alert('กรุณาเลือกการเลือกตั้ง');
         }
     };
+
+    const handelDropdownChange = async () =>{
+        if(electionType){
+            const electionName = election[electionType]
+            const studentsList = await getVoter(electionName);
+            const studentListMapped = studentsList.map((student)=>(
+                {   
+                    name: student.name, 
+                    studentId: student.student_id, 
+                    faculty: student.faculty, 
+                    major: student.major
+                }
+            ))
+            setStudents(studentListMapped);
+        }else{
+            setStudents([])
+        }
+    }
+
+    useEffect(()=>{
+        handelDropdownChange()
+    },[electionType])
 
     const createStudent =()=>{
         return students.map((student)=>(
@@ -152,16 +188,18 @@ const ManageDataStudent = () => {
                         type="file"
                         onChange={handleImportExcel}
                     />
+                    <div className='Vtitle'>
                     <label htmlFor="upload-file">
                         <Button
                             variant="contained"
                             component="span"
-                            style={{ margin: 20, backgroundColor: '#A03939' }}
-                            startIcon={<img src="https://cdn-icons-png.flaticon.com/512/11039/11039795.png" alt="icon" style={{ width: 20, marginRight: 10 }} />}
-                        >
-                            นำเข้าข้อมูลนักศึกษา
+                            // className='exp'
+                            style={{ minWidth: 250, backgroundColor: '#A03939', alignItems: 'center',justifyContent: 'center' }}
+                            startIcon={<img src="https://cdn-icons-png.flaticon.com/512/11039/11039795.png" alt="icon" style={{ maxWidth: 70 }} />}>
+                            <span>นำเข้าข้อมูลนักศึกษา</span>
                         </Button>
                     </label>
+                    </div>
                 </div>
                 <div className="form-group">
                     <label htmlFor="electionType">เลือกการเลือกตั้ง:</label>

@@ -2,12 +2,13 @@
 const mongoose = require('mongoose');
 
 const VoterSchema = new mongoose.Schema({
-  mail: String,
-  student_id: String,
   name: String,
+  student_id: String,
+  mail: String,
   faculty: String,
   major: String,
+  election_name :String,
   status : String,
 });
 
-module.exports = (table_name) =>{return mongoose.model(table_name, VoterSchema);}
+module.exports = mongoose.model("voters", VoterSchema)

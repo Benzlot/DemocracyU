@@ -14,13 +14,8 @@ async function checkAdmin (req, res) {
     console.log('MongoDB connected');
       
     let admin = await Admin.findOne({ mail: mail }).lean().exec();
-    // let adminall = await Admin.find();
 
-    // let addedadmin = new Admin({});
-
-    // await addedadmin.save();
-
-    console.log("found :", admin)
+    // console.log("found :", admin)
 
     res.status(200).json(admin);
   } catch (error) {

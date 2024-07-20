@@ -1,21 +1,11 @@
 
 const crypto = require('crypto');
 const mongoose = require('mongoose');
-const createCandidate = require('../models/candidateModel');
-const createVoteResult = require('../models/votingModel')
-const createVoter = require('../models/voterModel');
+const Candidate = require('../models/candidateModel');
+const VoteResult = require('../models/votingModel')
+const Voter = require('../models/voterModel');
 const Election = require('../models/electionModel');
 const { checkIfEmpty, checkIfStringIsZero } = require('../Service/commonService');
-
-
-async function getVotes (req, res) {
-  try {
-    const votes = await getAllVotes();
-    res.status(200).json(votes);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve votes' });
-  }
-};
 
 async function vote (req, res) {
   try {
@@ -28,29 +18,22 @@ async function vote (req, res) {
     });
 
     let Elections = await Election.findOne({election_name : election_name});
-    console.log(Elections)
     //check election exist
     checkIfEmpty(Elections, "Election not found")
     //check candidate exist
-    let Candidate = createCandidate(Elections.candidate_table);
-    let candidates = await Candidate.findOne({id : candidate_Id})
-    console.log(candidates)
+    let candidates = await Candidate.findOne({id : candidate_Id , election_name : election_name})
     checkIfEmpty(candidates, "Candidate not found")
     //check 
-    let Voter = createVoter(Elections.voter_table)
-    let voters = await Voter.findOne({mail : mail})
+    let voters = await Voter.findOne({mail : mail , election_name : election_name})
     console.log(voters)
     checkIfStringIsZero(voters.status, "Voter has been voted")
-
-
-    let VoteResult = createVoteResult(Elections.voteResult_table)
     
     const blockchain = new Blockchain();
     await blockchain.initialize(VoteResult);
     
     const hashed_data = crypto.createHash('sha256').update(name+mail).digest('hex');
     
-    await blockchain.addBlock(candidate_Id, hashed_data)
+    await blockchain.addBlock(candidate_Id, election_name ,hashed_data)
 
     //Add edit status user after vote <-- ปรับเป้นผู้ไม่สิทธิ์โหวตด้วย
     await Voter.updateOne(
@@ -110,10 +93,10 @@ class Blockchain {
       }
   }
 
-  createBlock(index, candidate_id, hashed_data, previous_hash) {
+  createBlock(index, candidate_id, election_name, hashed_data, previous_hash) {
       const nonce = '0';
       const hash = this.calculateHash(index, candidate_id, hashed_data, previous_hash, nonce);
-      return new this.model({ index, candidate_id, hashed_data, previous_hash, nonce, hash });
+      return new this.model({ index, candidate_id, election_name, hashed_data, previous_hash, nonce, hash });
   }
 
   calculateHash(index, candidate_id, hashed_data, previous_hash, nonce) {
@@ -131,10 +114,10 @@ class Blockchain {
       return await this.model.findOne().sort({ index: -1 });
   }
 
-  async addBlock(candidate_id, hashed_data) {
+  async addBlock(candidate_id, election_name, hashed_data) {
       const latestBlock = await this.getLatestBlock();
       const newIndex = latestBlock.index + 1;
-      const newBlock = this.createBlock(newIndex, candidate_id, hashed_data, latestBlock.hash);
+      const newBlock = this.createBlock(newIndex, candidate_id, election_name, hashed_data, latestBlock.hash);
       this.mineBlock(newBlock);
       await newBlock.save();
       this.chain.push(newBlock);

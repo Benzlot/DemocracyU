@@ -5,6 +5,7 @@ const createCandidate = require('../models/candidateModel');
 const createVoteResult = require('../models/votingModel')
 const mongoose = require('mongoose');
 const { checkNotEmptyThrowError ,checkIfEmpty } = require('../Service/commonService');
+const { request } = require('express');
 
 
 async function getElection (req, res) {
@@ -30,7 +31,7 @@ async function getElection (req, res) {
 async function getElectionbyName (req, res) {
   try {
 
-    let {election_name} = req.body
+    let {name} = req.body
 
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
@@ -39,7 +40,7 @@ async function getElectionbyName (req, res) {
     });
     console.log('MongoDB connected');
       
-    let Elections = await Election.findOne({election_name : election_name});
+    let Elections = await Election.findOne({election_name : name});
     checkIfEmpty(Elections, "Election not found")
 
     console.log("Election ==> ",Elections)
@@ -100,6 +101,7 @@ async function addElection (req, res) {
 }
 
 async function updateElection (req, res) {
+  console.log(req.body);
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,

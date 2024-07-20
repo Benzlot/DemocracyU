@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { Link,useNavigate } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from 'react';
+import { Link,useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
@@ -18,24 +18,25 @@ const EditVoting = () => {
     const [endDate, setEndDate] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+    let state = location.state
 
-    async function fetchElection() {
+    async function fetchElection(state) {
         try {
-          const rawData = await getElectionbyName();
+          const rawData = await getElectionbyName(state.voting.name);
+          setElectionName(rawData.election_name);
+          setElectionType(rawData.election_type);
+          setStartDate(rawData.election_start);
+          setEndDate(rawData.election_end);
           console.log(rawData)
-          if (Array.isArray(rawData)) {
-            const data = mapElection(rawData);
-              setElection(data);
-          } else {
-            console.error("Expected an array but got:", rawData);
-          }
         } catch (error) {
           console.error("Failed to fetch election:", error);
         }
       }
 
     useEffect(() => {
-        fetchElection();
+        fetchElection(state);
+        console.log(state);
     }, []);
 
     const handleStartDateChange = (e) => {
@@ -108,7 +109,7 @@ const EditVoting = () => {
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="electionName">ตั้งชื่อการเลือกตั้ง:</label>
-                        <input
+                        <input disabled
                             type="text"
                             id="electionName"
                             value={electionName}

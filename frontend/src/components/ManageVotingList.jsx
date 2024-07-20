@@ -49,7 +49,10 @@ const ManageVotingList = () => {
     };
 
     const handleEdit = (voting) => {
-        navigate(`/edit-voting/${voting.id}`, { state: { voting } });
+        navigate(`/edit-voting/${voting.id}`
+            , { state: { voting } }
+        );
+        // console.log(voting)
     };
 
     const votingData = [

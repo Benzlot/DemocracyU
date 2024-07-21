@@ -10,7 +10,6 @@ import '../components-style/ManageDataStudent.css';
 import '../components-style/ManageVoting.css';
 import { getElection } from '../services/electionService';
 import { addCandidate, getCandidates, deleteCandidate } from '../services/candidateService';
-import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import ClipLoader from 'react-spinners/ClipLoader';
 
@@ -24,6 +23,7 @@ const ManageDataCandidate = () => {
     const [election, setElection] = useState([]);
     const [loading, setLoading] = useState(false);
     const [imagePreview, setImagePreview] = useState('');
+    const [file ,setFile] = useState([])
 
     async function fetchElection() {
         setIsLoading(true)
@@ -46,36 +46,7 @@ const ManageDataCandidate = () => {
         fetchElection();
     }, []);
 
-    const handleImportExcel = (event) => {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-
-        reader.onload = (event) => {
-            const binaryStr = event.target.result;
-            const workbook = XLSX.read(binaryStr, { type: 'binary' });
-            const sheetName = workbook.SheetNames[0];
-            const sheet = workbook.Sheets[sheetName];
-            const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-            console.log(data);
-
-            const rows = data.slice(1).filter(row => row.some(cell => cell));
-
-            const formattedData = rows.map(row => ({
-                name: row[0],
-                studentId: row[1],
-                faculty: row[2],
-                major: row[3],
-                vision: row[4],
-                image: ''
-            }));
-
-            setCandidates(formattedData);
-        };
-
-        reader.readAsBinaryString(file);
-    };
-
+   
     const handleDelete = async (index) => {
         if (electionType) {
             const electionName = election[electionType]
@@ -89,6 +60,7 @@ const ManageDataCandidate = () => {
     };
 
     const handleClickOpen = () => {
+        setImagePreview('')
         setOpen(true);
     };
 
@@ -107,6 +79,7 @@ const ManageDataCandidate = () => {
     const handleImageChange = (event) => {
         const file = event.target.files[0];
         if (file) {
+            setFile((prevFile) => [...prevFile, file])
             const reader = new FileReader();
             reader.onloadend = () => {
                 setNewCandidate(prevState => ({
@@ -134,9 +107,19 @@ const ManageDataCandidate = () => {
     const handleConfirm = async () => {
         if (electionType) {
             setLoading(true);
+            const formData = new FormData();
+            console.log(file)
             const candidateList = createCandidate();
+            let candidateString = JSON.stringify(candidateList)
+            console.log(candidateString)
             const electionName = election[electionType];
-            await addCandidate(electionName, candidateList);
+            formData.append('election_name', electionName);
+            formData.append('candidate_list', candidateString);
+            for (let i = 0; i < file.length; i++) {
+                formData.append('image', file[i]);
+            }
+            console.log(formData)
+            await addCandidate(formData);
             Swal.fire({
                 position: "center",
                 icon: "success",
@@ -145,6 +128,7 @@ const ManageDataCandidate = () => {
                 timer: 1500
             });
             await fetchCandidates();
+            setFile([]);
             setLoading(false);
         } else {
             alert('กรุณาเลือกการเลือกตั้ง');
@@ -155,14 +139,16 @@ const ManageDataCandidate = () => {
         if (electionType) {
             const electionName = election[electionType];
             const candidatesList = await getCandidates(electionName);
+            // console.log(candidatesList[0].img.path)
             const candidateListMapped = candidatesList.map((candidate) => ({
                 name: candidate.name,
                 studentId: candidate.student_id,
                 faculty: candidate.faculty,
                 major: candidate.major,
                 vision: candidate.vision,
-                image: candidate.image
+                image: `/uploads/${candidate.img.path}`
             }));
+
             setCandidates(candidateListMapped);
         } else {
             setCandidates([]);
@@ -177,7 +163,6 @@ const ManageDataCandidate = () => {
                 faculty: candidate.faculty,
                 major: candidate.major,
                 vision: candidate.vision,
-                image: candidate.image
             }
         ));
     };
@@ -185,17 +170,9 @@ const ManageDataCandidate = () => {
     const handelDropdownChange = async () => {
         setLoading(true);
         if (electionType) {
-            const electionName = election[electionType];
-            const candidatesList = await getCandidates(electionName);
-            const candidateListMapped = candidatesList.map((candidate) => ({
-                name: candidate.name,
-                studentId: candidate.student_id,
-                faculty: candidate.faculty,
-                major: candidate.major,
-                vision: candidate.vision,
-                image: candidate.image
-            }));
-            setCandidates(candidateListMapped);
+
+            await fetchCandidates()
+
         } else {
             setCandidates([]);
         }
@@ -240,25 +217,7 @@ const ManageDataCandidate = () => {
                         <div className='Votename'><h1>จัดการข้อมูลผู้ลงสมัคร</h1></div>
                     </div>
                 </div>
-                <div className='VTitle'>
-                    <input
-                        accept=".xlsx, .xls"
-                        style={{ display: 'none' }}
-                        id="upload-file"
-                        type="file"
-                        onChange={handleImportExcel}
-                    />
-                    <label htmlFor="upload-file">
-                        <Button
-                            variant="contained"
-                            component="span"
-                            style={{ minWidth: 250, backgroundColor: '#A03939', alignItems: 'center', justifyContent: 'center' }}
-                            startIcon={<img src="https://cdn-icons-png.flaticon.com/512/11039/11039795.png" alt="icon" style={{ maxWidth: 70 }} />}
-                        >
-                            <span>นำเข้าข้อมูลผู้ลงสมัคร</span>
-                        </Button>
-                    </label>
-                </div>
+                
                 <div className="form-group">
                     <label htmlFor="electionType">เลือกการเลือกตั้ง:</label>
                     <select

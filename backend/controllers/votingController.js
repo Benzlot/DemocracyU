@@ -22,7 +22,7 @@ async function getVoteResult (req,res) {
           checkIfEmpty(Elections, "Election not found")
 
           let voteResults = await VoteResult.aggregate([
-            { $match: { election_name: electionName } },
+            { $match: { election_name: election_name } },
             { $group: { _id: "$candidate_id", count: { $sum: 1 } } },
             { $sort: { count: -1 } }
           ]);
@@ -130,7 +130,7 @@ class Blockchain {
   }
 
   calculateHash(index, candidate_id, hashed_data, previous_hash, nonce) {
-      return crypto.createHash('sha256').update(index.toString() + candidate_id + hashed_data + previous_hash + nonce).digest('hex');
+      return crypto.createHash('sha256').update(index.toString() + candidate_id.toString() + hashed_data + previous_hash + nonce).digest('hex');
   }
 
   mineBlock(block) {

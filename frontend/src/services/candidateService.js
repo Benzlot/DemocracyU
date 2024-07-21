@@ -14,11 +14,12 @@ export const getCandidates = async (election_name) => {
     throw error;
   }
 };
-export const addCandidate = async (election_name, candidate_list) => {
-  const response = await axios.post(`${API_URL}/add`, { 
-      election_name : election_name,
-      candidate_list : candidate_list
-    });
+export const addCandidate = async (formData) => {
+  const response = await axios.post(`${API_URL}/add`,formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 };
 

@@ -43,7 +43,7 @@ async function getVoterStatus (req,res){
       let Elections = await Election.findOne({election_name : election_name});
       checkIfEmpty(Elections, "Election not found")
 
-      let voters = await Voteraggregate([
+      let voters = await Voter.aggregate([
         {$match: { election_name: election_name } },
         {$group: {
             _id: "$status", // Group by status
@@ -51,13 +51,31 @@ async function getVoterStatus (req,res){
           }},
         {$sort: { _id: 1 }}])
       console.log("voters ==> ",voters)
-      res.status(200).json(voters);
+      res.status(200).json(transformCounts(voters));
   } catch (error) {
       console.log(error)
       res.status(500).json({ error: error.message ||'Failed to fetch voters' });
   } finally {
       mongoose.connection.close();
   }
+}
+
+function transformCounts(data) {
+  // Initialize result object with default values
+  const result = {
+    vote: 0,
+    nonVote: 0
+  };
+
+  data.forEach(item => {
+    if (item._id === '0') {
+      result.nonVote = item.count;
+    } else if (item._id === '1') {
+      result.vote = item.count;
+    }
+  });
+
+  return result;
 }
 
 
@@ -141,6 +159,7 @@ async function getVoterByMail (req, res){
       
     // let Elections = await Election.findOne({election_name : election_name});
     const voter = await Voter.findOne({ mail : mail})
+    console.log("Voter",voter)
     checkIfEmpty(voter, "voter not found")
 
 

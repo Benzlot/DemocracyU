@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../components-style/DirectP.css'
 import { getCandidates } from '../services/candidateService';
+import CandidateRank from './CandidateRank';
 
 const DirectoryPage = () => {
   const [candidates, setCandidates] = useState([]);
@@ -31,17 +32,10 @@ const DirectoryPage = () => {
   }
 
   return (
-    <div>
+    <div className='text-align'>
       <div className='Directory'><h1>ทำเนียบนักศึกษา</h1></div>
-    <div className="container">
-      {candidates.map(candidate => (
-        <div key={candidate.id} className="candidate-card">
-          <img src={candidate.imageSrc} alt={candidate.candidateName} className="candidate-image" />
-          <h2 className="candidate-name">{candidate.candidateName}</h2>
-          <p className="candidate-description">{candidate.description}</p>
-        </div>
-      ))}
-    </div>
+    <CandidateRank/>
+    
     </div>
   );
 };

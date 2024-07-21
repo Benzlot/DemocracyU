@@ -9,7 +9,7 @@
     justify-content: center;
     text-wrap: wrap;
     display: flex;
-    margin-bottom: 2vw;
+    margin-bottom: 0vw;
     
 }
 .VTitle h1{
@@ -19,7 +19,9 @@
     width: 5vw;
     height: 5vw;
 }
-
+.form-group{
+    margin-top: 5vw;
+}
 .container {
     display: flex;
     flex-direction: column;
@@ -47,4 +49,19 @@
     flex: 0 0 auto;
 
 font-size: 18px;
+}
+.form-group button{
+    margin-top: -3vw;
+}
+@media (max-width: 1000px) {
+    h1{
+        font-size: 5vw;
+    }
+    .VImg{
+        width: 10vw;
+        height: 10vw;
+    }
+    .form-group {
+        text-align: center;
+    }
 }

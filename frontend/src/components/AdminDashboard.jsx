@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -14,13 +14,22 @@ const AdminDashboard = () => {
   const handleNavigate = (path) => {
     navigate(path);
   };
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
   return (
     <div>
       <div className="navbar">
         <div className="navbar-left">
           <div className="DemocracyU">
-            <Link to="/" className="Title">DemocracyU</Link>
+            <Link to="/admin" className="Title">DemocracyU</Link>
           </div>
         </div>
         <div className="navbar-right">
@@ -28,11 +37,18 @@ const AdminDashboard = () => {
             <>
               <div className="username">{account.name}</div>
               {userData && userData.photoUrl ? (
-                <img src={userData.photoUrl} alt={`${account.name}'s profile`} className="profile-pic" />
+                <img 
+                  src={userData.photoUrl} 
+                  alt={`${account.name}'s profile`} 
+                  className="profile-pic" 
+                  onClick={toggleDropdown}
+                />
               ) : (
                 <div>No Profile Picture</div>
               )}
-              <button onClick={logout} className="logout-button">Logout</button>
+              <div className={`dropdown-menu ${isDropdownOpen ? 'open' : ''}`}>
+                <button onClick={logout} className="logout-button">Logout</button>
+              </div>
             </>
           ) : (
             <Link to="/login" className="login">Login</Link>

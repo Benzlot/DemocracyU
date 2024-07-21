@@ -1,14 +1,18 @@
 // Candidate.js (mongoose model example)
 const mongoose = require('mongoose');
 
-const CandidateSchema = new mongoose.Schema({
-  id : Number,
+const candidateSchema = new mongoose.Schema({
+  id: { type: Number, unique: true },
   name: String,
-  student_id: String,
+  student_id: { type: String, unique: true },
   faculty: String,
   major: String,
   vision: String,
-  election_name :String,
+  election_name: String,
+  img: {
+    path: String,
+    contentType: String,
+  },
 });
 
-module.exports = mongoose.model("candidate", CandidateSchema)
+module.exports = mongoose.model('candidates', candidateSchema);

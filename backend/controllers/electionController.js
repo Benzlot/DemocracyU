@@ -70,6 +70,8 @@ async function addElection (req, res) {
 
     await addedElection.save()
 
+    scheduleElectionEndCheck(addedElection)
+
     let addedCandidate = new Candidate({
       id: 0,
       name: "ไม่ประสงลงคะแนน",
@@ -81,6 +83,7 @@ async function addElection (req, res) {
     })
 
     await addedCandidate.save()
+
 
     let Elections = await Election.find();
 
@@ -154,6 +157,29 @@ async function deleteElection (req, res) {
   }
 
 }
+
+
+const scheduleElectionEndCheck = (election) => {
+  const endDate = new Date(election.election_end);
+  const now = new Date();
+
+  // Calculate the time difference in milliseconds
+  const timeDiff = endDate.getTime() - now.getTime();
+
+  if (timeDiff > 0) {
+    setTimeout(() => {
+      triggerElectionEndFunction(election);
+    }, timeDiff);
+  }
+};
+
+const triggerElectionEndFunction = (election) => {
+  console.log(`Election ${election.election_name} has ended. Triggering end function.`);
+  // Add your desired functionality here
+  // Example: update election status, notify users, etc.
+};
+
+
 
 
 module.exports = {

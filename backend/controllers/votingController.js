@@ -7,6 +7,36 @@ const Voter = require('../models/voterModel');
 const Election = require('../models/electionModel');
 const { checkIfEmpty, checkIfStringIsZero } = require('../Service/commonService');
 
+async function getVoteResult (req,res) {
+    try{
+        const { election_name } = req.body;
+
+        await mongoose.connect(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            dbName: 'DemocracyU',
+          });
+
+          let Elections = await Election.findOne({election_name : election_name});
+          //check election exist
+          checkIfEmpty(Elections, "Election not found")
+
+          let voteResults = await VoteResult.aggregate([
+            { $match: { election_name: electionName } },
+            { $group: { _id: "$candidate_id", count: { $sum: 1 } } },
+            { $sort: { count: -1 } }
+          ]);
+
+          console.log(voteResults)
+          res.status(200).json(voteResults)
+    }catch (error) {
+        console.log(error)
+        res.status(500).json({ error: error.message || 'Failed to cast vote result' });
+      }finally{
+        mongoose.connection.close();
+    }
+}
+
 async function vote (req, res) {
   try {
     const { election_name ,candidate_Id, name, mail } = req.body;
@@ -44,7 +74,7 @@ async function vote (req, res) {
     res.status(200).json({ message: 'Vote cast successfully' });
   } catch (error) {
     console.log(error)
-    res.status(500).json({ error: error.message || 'Failed to cast vote' });
+    res.status(500).json({ error: error.message || 'Failed to vote' });
   }finally{
     mongoose.connection.close();
   }
@@ -141,4 +171,4 @@ class Blockchain {
 }
 
 
-module.exports = {vote};
+module.exports = {vote,getVoteResult};

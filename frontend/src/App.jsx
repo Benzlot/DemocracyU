@@ -21,6 +21,14 @@ function App() {
   const { account, userData, isAdmin, isLoading } = useContext(AuthContext);
   const location = useLocation();
 
+  
+
+  // Define paths where Navbar should not be shown
+  const noNavbarPaths = ['/login', '/admin', '/manage-student', '/manage-candidate', '/manage-voting', '/manage-voting-list', '/edit-voting','/vote'];
+
+  // Check if current path is in noNavbarPaths
+  const showNavbar = account && !noNavbarPaths.some(path => location.pathname.startsWith(path));
+
   if (isLoading) {
     // Render spinner while loading
     return (
@@ -39,13 +47,6 @@ function App() {
       </div>
     );
   }
-
-  // Define paths where Navbar should not be shown
-  const noNavbarPaths = ['/login', '/admin', '/manage-student', '/manage-candidate', '/manage-voting', '/manage-voting-list', '/edit-voting','/vote'];
-
-  // Check if current path is in noNavbarPaths
-  const showNavbar = account && !noNavbarPaths.some(path => location.pathname.startsWith(path));
-
   return (
     <>
       {/* Conditionally render Navbar */}

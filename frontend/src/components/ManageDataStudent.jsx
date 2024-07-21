@@ -17,7 +17,7 @@ const ManageDataStudent = () => {
     const [open, setOpen] = useState(false);
     const [newStudent, setNewStudent] = useState({ name: '', studentId: '', faculty: '', major: '' });
     const [election, setElection] = useState([]);
-    
+    const navigate = useNavigate();
     async function fetchElection() {
         try {
           const rawData = await getElection();

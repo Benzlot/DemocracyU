@@ -1,40 +1,68 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { castVote } from '../services/votingService';
 import CandidateCard from './CandidateCard';
 import '../components-style/VotingPage.css';
 import { getCandidates } from '../services/candidateService';
+import { getVoterByMail } from '../services/voterService';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
+import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+import Swal from 'sweetalert2';
+import DigitalClock from './DigitalClock';
 
 const VotingPage = () => {
+  const { account, userData, logout } = useContext(AuthContext);
   const [votes, setVotes] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [electionName, setElectionName] = useState('');
+  const [status, setStatus] = useState('');
+  const [ isLoading, setIsLoading] = useState(false);
+
+
+  async function fetchVoterData() {
+    try {
+      // console.log(account)
+      setIsLoading(true)
+      let rawVoter = await getVoterByMail(account.username);
+      setElectionName(rawVoter.election_name)
+      setStatus(rawVoter.status)
+
+    } catch (error) {
+      console.error("Failed to fetch candidates:", error);
+    }
+  }
+
+  async function fetchCandidate() {
+    let rawCandidate = await getCandidates(electionName);
+    let mappedCandidate = mapCandidate(rawCandidate);
+    setVotes(mappedCandidate)
+    setIsLoading(false)
+  }
 
   useEffect(() => {
-    async function fetchVotes() {
-      try {
-        const rawData = await getCandidates();
-        if (Array.isArray(rawData)) {
-          const data = mapCandidate(rawData);
-          setVotes(data);
-        } else {
-          console.error("Expected an array but got:", rawData);
-        }
-      } catch (error) {
-        console.error("Failed to fetch candidates:", error);
-      }
-    }
-    fetchVotes();
+    fetchVoterData();
   }, []);
 
+  useEffect(() => {
+    if(status === "0"){
+      fetchCandidate();
+    }else if(status === "1"){
+      //navigate to result
+    }
+  }, [electionName, status]);
+
   const mapCandidate = (rawData) => {
-    return rawData.map((data) => ({
-      id: data._id, // Assuming _id is unique and can be used as key
-      imageSrc: data.imageSrc || 'https://via.placeholder.com/150', // Example placeholder URL
-      candidateName: data.name || 'Candidate Name', // Example fallback text
-      description: data.vision || 'Candidate Vision', // Example fallback text
-    }));
+    return rawData
+      .filter((data) => data.id !== 0) // Filter out items where id is 0
+      .map((data) => ({
+        id: data.id, // Assuming id is unique and can be used as key
+        imageSrc: data.imageSrc || 'https://via.placeholder.com/150', // Example placeholder URL
+        candidateName: data.name || 'Candidate Name', // Example fallback text
+        description: data.vision || 'Candidate Vision', // Example fallback text
+      }));
   };
+  
 
   const handleVote = async () => {
     if (selectedCandidate) {
@@ -49,6 +77,22 @@ const VotingPage = () => {
       alert('Please select a candidate before voting.');
     }
   };
+
+  const handleOnSelect = async (id) =>{
+    setSelectedCandidate(id)
+    const { value: email } = await Swal.fire({
+      title: `กรุณากรอกอีเมลสถาบันเพื่อยืนยันการเลือกเบอร์ ${id}`,
+      input: "email",
+      inputLabel: `Your email address`,
+      inputPlaceholder: account.username
+    });
+    if (email === account.username) {
+      Swal.fire(`Entered email: ${email}`);
+      //
+    }else{
+      Swal.fire(`Email not match`);
+    }
+  }
 
   return (
     <div>
@@ -76,6 +120,7 @@ const VotingPage = () => {
                 </div>
             </div>
             </div>
+            <DigitalClock/>
       <div className='VTitle'>
         <img
           loading="lazy"
@@ -93,11 +138,12 @@ const VotingPage = () => {
             imageSrc={vote.imageSrc}
             name={vote.candidateName}
             description={vote.description}
-            onSelect={() => setSelectedCandidate(vote.id)}
+            onSelect={() => handleOnSelect(vote.id)}
           />
         ))}
       </div>
-      <button onClick={handleVote} disabled={!selectedCandidate} className="submitButton">Submit Vote</button>
+      
+      <button onClick={handleVote} disabled={!selectedCandidate} className="submitButton">ไม่ประสงค์ลงคะแนน</button>
     </div>
   );
 };

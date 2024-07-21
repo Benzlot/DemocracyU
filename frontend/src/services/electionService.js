@@ -7,36 +7,36 @@ export const getElection = async () => {
   return response.data;
 };
 
-export const getElectionbyName = async (name) => {
+export const getElectionbyName = async (election_name) => {
     const response = await axios.post(`${API_URL}/getbyName`, { 
-        name : name,
+      election_name : election_name
       });
     return response.data;
   };
 
-export const addElection = async (name,type,start,end) => {
+export const addElection = async (election_name,election_type,start_date,end_date) => {
   const response = await axios.post(`${API_URL}/add`, { 
-      name : name,
-      type : type, 
-      start : start, 
-      end :end
+    election_name: election_name,
+    election_type: election_type,
+    start_date: start_date,
+    end_date: end_date,
     });
   return response.data;
 };
 
-export const updateElection = async (name,type,start,end) => {
+export const updateElection = async (election_name,election_type,start_date,end_date) => {
     const response = await axios.post(`${API_URL}/update`, { 
-        name : name,
-        type : type, 
-        start : start, 
-        end :end
+      election_name: election_name,
+      election_type: election_type,
+      start_date: start_date,
+      end_date: end_date,
       });
     return response.data;
   };
 
-export const deleteElection = async (name) => {
+export const deleteElection = async (election_name) => {
     const response = await axios.post(`${API_URL}/delete`, { 
-        name : name
+      election_name : election_name,
       });
     return response.data;
   };

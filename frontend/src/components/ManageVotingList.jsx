@@ -10,13 +10,16 @@ import DigitalClock from '../components/DigitalClock';
 import '../components-style/ManageVotingList.css';
 import { getElection } from '../services/electionService';
 import moment from 'moment';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 const ManageVotingList = () => {
-    const { account, userData, logout } = useContext(AuthContext);
     const navigate = useNavigate();
+    const { account, userData, logout  } = useContext(AuthContext);
     const [election, setElection] = useState([]);
+    const [ isLoading, setIsLoading] = useState(false);
 
     async function fetchElection() {
+        setIsLoading(true)
         try {
             const rawData = await getElection();
             console.log(rawData);
@@ -28,6 +31,8 @@ const ManageVotingList = () => {
             }
         } catch (error) {
             console.error("Failed to fetch election:", error);
+        } finally{
+            setIsLoading(false)
         }
     }
 
@@ -52,6 +57,25 @@ const ManageVotingList = () => {
     const handleEdit = (voting) => {
         navigate(`/edit-voting/${voting.id}`, { state: { voting } });
     };
+
+    if (isLoading) {
+        // Render spinner while loading
+        return (
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh'
+              }}>
+                <ClipLoader
+                  color="#ff0000"
+                  cssOverride={{}}
+                  size={100}
+                  speedMultiplier={2}
+                />
+            </div>
+        );
+    }
 
     return (
         <div>

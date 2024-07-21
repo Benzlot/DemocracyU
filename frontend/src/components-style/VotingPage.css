@@ -1,29 +1,28 @@
-.VTitle{
-    justify-content: center;
-    text-wrap: wrap;
+.VTitle {
     display: flex;
-}
-.VImg{
-    width: 5vw;
-    height: 5vw;
-}
-.Votename{
-margin-left: 2vw;
-}
-
-.container {
+    align-items: center; /* Centers content horizontally */
+    justify-content: center; /* Centers content vertically */
+    margin: 3vw auto; /* Auto margins to center the element */
+    text-align: center; /* Centers text inside the component */
+  }
+  .VTitle img{
+    margin: 0;
+  }
+  
+  .container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-}
-
-.submitButton {
+  }
+  
+  .submitButton {
     display: block;
     margin: 20px auto;
     padding: 10px 20px;
-    background-color: #8B0000;
-    color: white;
+    background-color: #F2E8C6;
+    color: #8B0000;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-}
+  }
+  

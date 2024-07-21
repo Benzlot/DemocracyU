@@ -18,16 +18,48 @@ async function getVoter (req, res) {
     let Elections = await Election.findOne({election_name : election_name});
     checkIfEmpty(Elections, "Election not found")
 
-    let voters = await Voter.find()
+    let voters = await Voter.find({election_name : election_name})
     
     console.log("voters ==> ",voters)
     res.status(200).json(voters);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch voters' });
+    console.log(error)
+    res.status(500).json({ error: error.message ||'Failed to fetch voters' });
   } finally {
     mongoose.connection.close();
   }
 };
+
+async function getVoterStatus (req,res){
+  try{
+      const { election_name } = req.body
+        
+      await mongoose.connect(process.env.MONGODB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        dbName: 'DemocracyU',
+      });
+        
+      let Elections = await Election.findOne({election_name : election_name});
+      checkIfEmpty(Elections, "Election not found")
+
+      let voters = await Voteraggregate([
+        {$match: { election_name: election_name } },
+        {$group: {
+            _id: "$status", // Group by status
+            count: { $sum: 1 } // Count the number of documents for each status
+          }},
+        {$sort: { _id: 1 }}])
+      console.log("voters ==> ",voters)
+      res.status(200).json(voters);
+  } catch (error) {
+      console.log(error)
+      res.status(500).json({ error: error.message ||'Failed to fetch voters' });
+  } finally {
+      mongoose.connection.close();
+  }
+}
+
 
 async function addVoter (req, res) {
   try {
@@ -44,8 +76,6 @@ async function addVoter (req, res) {
     checkIfEmpty(Elections, "Election not found")
 
     let result = []
-
-    const Voter = createVoter(Elections.voter_table);
 
     for (const student of student_list) {
       const voters = await Voter.findOne({mail: student.mail})
@@ -87,8 +117,6 @@ async function deleteVoterbyID (req, res){
   let Elections = await Election.findOne({election_name : election_name});
   checkIfEmpty(Elections, "Election not found")
 
-  const Voter = createVoter(Elections.voter_table);
-
   const result = await Voter.deleteOne({ student_id : student_id})
 
   res.status(200).json({result : result});
@@ -100,10 +128,39 @@ async function deleteVoterbyID (req, res){
 }
 }
 
+async function getVoterByMail (req, res){
+  try {
+  
+    let {mail} = req.body
+
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      dbName: 'DemocracyU',
+    });
+      
+    // let Elections = await Election.findOne({election_name : election_name});
+    const voter = await Voter.findOne({ mail : mail})
+    checkIfEmpty(voter, "voter not found")
+
+
+    res.status(200).json(voter);
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: error.message ||'Failed to get voter' });
+  } finally {
+    mongoose.connection.close();
+  }
+}
+
+
+
 
 
 module.exports = {
   getVoter,
   addVoter,
-  deleteVoterbyID
+  deleteVoterbyID,
+  getVoterByMail,
+  getVoterStatus
 }

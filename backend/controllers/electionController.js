@@ -70,6 +70,18 @@ async function addElection (req, res) {
 
     await addedElection.save()
 
+    let addedCandidate = new Candidate({
+      id: 0,
+      name: "ไม่ประสงลงคะแนน",
+      student_id: "00",
+      faculty: "00",
+      major: "00",
+      vision: "00",
+      election_name :election_name,
+    })
+
+    await addedCandidate.save()
+
     let Elections = await Election.find();
 
     res.status(200).json(Elections);

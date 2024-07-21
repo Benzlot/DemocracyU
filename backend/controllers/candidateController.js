@@ -16,15 +16,16 @@ async function getCandidates  (req, res) {
     });
     console.log('MongoDB connected');
 
-    let Election = await Election.findOne({election_name : election_name});
-    checkIfEmpty(Election, "Election not found")
+    let election = await Election.findOne({election_name : election_name});
+    checkIfEmpty(election, "Election not found")
       
-    let candidates = await Candidate.find();
+    let candidates = await Candidate.find({election_name : election_name});
 
     console.log("candidates ==> ",candidates)
     res.status(200).json(candidates);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch candidates' });
+    console.log(error)
+    res.status(500).json({ error: error.message || 'Failed to fetch candidates' });
   } finally {
     mongoose.connection.close();
   }
@@ -69,23 +70,35 @@ async function addCandidate (req, res) {
     checkIfEmpty(Elections, "Election not found")
 
     let result = []
+    let maxId
 
     for (let index = 0; index < candidate_list.length; index++) {
       const Candidates = candidate_list[index];
       const candidate = await Candidate.findOne({student_id: Candidates.student_id})
       if(checkNotEmpty(candidate)){
+        if(!maxId){
+          let [result] = await Candidate.aggregate([
+            {
+              $group: {
+                _id: null,
+                maxId: { $max: "$id" }
+              }
+            }
+          ])
+          maxId = result.maxId;
+        }
         const newCandidate = new Candidate({
-            id: index.toString(),
+            id: maxId+1,
             ...Candidates,
             election_name : election_name
         });
         await newCandidate.save();
-        result.push({ message:`Candidate ${Candidates.name} (index ${index}) inserted`});
+        result.push({ message:`Candidate ${Candidates.name} inserted in Number${maxId}`});
       }else{
         if(candidate.election_name){
-          result.push({ message :`Candidate ${Candidates.name} (index ${index}) is on ${candidate.election_name} skip`});
+          result.push({ message :`Candidate ${Candidates.name} is on ${candidate.election_name} skip`});
         }else{
-          result.push({ message :`Candidate ${Candidates.name} (index ${index}) skip`});
+          result.push({ message :`Candidate ${Candidates.name} skip`});
         }
       }
   }

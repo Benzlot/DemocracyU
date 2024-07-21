@@ -4,6 +4,7 @@ import DigitalClock from '../components/DigitalClock';
 import { IconButton, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField, CircularProgress } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PhotoCamera from '@mui/icons-material/PhotoCamera'; // Added import
 import { useNavigate } from 'react-router-dom';
 import '../components-style/ManageDataStudent.css';
 import '../components-style/ManageVoting.css';
@@ -17,11 +18,12 @@ const ManageDataCandidate = () => {
     const [candidates, setCandidates] = useState([]);
     const [electionType, setElectionType] = useState('');
     const [open, setOpen] = useState(false);
-    const [newCandidate, setNewCandidate] = useState({ name: '', studentId: '', faculty: '', major: '', vision: '' });
+    const [newCandidate, setNewCandidate] = useState({ name: '', studentId: '', faculty: '', major: '', vision: '', image: '' });
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [election, setElection] = useState([]);
-    const [loading, setLoading] = useState(false); // เพิ่มสถานะการโหลดนี้
+    const [loading, setLoading] = useState(false);
+    const [imagePreview, setImagePreview] = useState('');
 
     async function fetchElection() {
         setIsLoading(true)
@@ -55,19 +57,17 @@ const ManageDataCandidate = () => {
             const sheet = workbook.Sheets[sheetName];
             const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-            // ตรวจสอบโครงสร้างของข้อมูลที่อ่านได้
             console.log(data);
 
-            // ลบแถวหัวเรื่องออกและกรอง row ที่ไม่มีข้อมูล
             const rows = data.slice(1).filter(row => row.some(cell => cell));
 
-            // ตั้งค่าข้อมูลใน state
             const formattedData = rows.map(row => ({
                 name: row[0],
                 studentId: row[1],
                 faculty: row[2],
                 major: row[3],
-                vision: row[4]
+                vision: row[4],
+                image: ''
             }));
 
             setCandidates(formattedData);
@@ -104,17 +104,36 @@ const ManageDataCandidate = () => {
         }));
     };
 
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setNewCandidate(prevState => ({
+                    ...prevState,
+                    image: reader.result
+                }));
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setNewCandidate(prevState => ({
+                ...prevState,
+                image: ''
+            }));
+            setImagePreview('');
+        }
+    };
+
     const handleSubmit = () => {
         setCandidates(prevCandidates => [...prevCandidates, newCandidate]);
-        setNewCandidate({ name: '', studentId: '', faculty: '', major: '', vision: '' });
+        setNewCandidate({ name: '', studentId: '', faculty: '', major: '', vision: '', image: '' });
         handleClose();
     };
 
-    // ฟังก์ชัน handleConfirm
     const handleConfirm = async () => {
-        // ตรวจสอบว่ามีการเลือก electionType หรือไม่
         if (electionType) {
-            setLoading(true); // ตั้งค่าสถานะการโหลดเป็น true
+            setLoading(true);
             const candidateList = createCandidate();
             const electionName = election[electionType];
             await addCandidate(electionName, candidateList);
@@ -125,10 +144,9 @@ const ManageDataCandidate = () => {
                 showConfirmButton: false,
                 timer: 1500
             });
-            await fetchCandidates(); // Fetch the updated list of candidates
-            setLoading(false); // ตั้งค่าสถานะการโหลดเป็น false
+            await fetchCandidates();
+            setLoading(false);
         } else {
-            // หากไม่มีการเลือก electionType แสดงการแจ้งเตือน
             alert('กรุณาเลือกการเลือกตั้ง');
         }
     };
@@ -142,7 +160,8 @@ const ManageDataCandidate = () => {
                 studentId: candidate.student_id,
                 faculty: candidate.faculty,
                 major: candidate.major,
-                vision: candidate.vision
+                vision: candidate.vision,
+                image: candidate.image
             }));
             setCandidates(candidateListMapped);
         } else {
@@ -157,35 +176,35 @@ const ManageDataCandidate = () => {
                 name: candidate.name,
                 faculty: candidate.faculty,
                 major: candidate.major,
-                vision: candidate.vision
+                vision: candidate.vision,
+                image: candidate.image
             }
-        ))
-    }
+        ));
+    };
 
     const handelDropdownChange = async () => {
-        setLoading(true); // ตั้งค่าสถานะการโหลดเป็น true
+        setLoading(true);
         if (electionType) {
-            const electionName = election[electionType]
+            const electionName = election[electionType];
             const candidatesList = await getCandidates(electionName);
-            const candidateListMapped = candidatesList.map((candidate) => (
-                {
-                    name: candidate.name,
-                    studentId: candidate.student_id,
-                    faculty: candidate.faculty,
-                    major: candidate.major,
-                    vision: candidate.vision
-                }
-            ))
+            const candidateListMapped = candidatesList.map((candidate) => ({
+                name: candidate.name,
+                studentId: candidate.student_id,
+                faculty: candidate.faculty,
+                major: candidate.major,
+                vision: candidate.vision,
+                image: candidate.image
+            }));
             setCandidates(candidateListMapped);
         } else {
-            setCandidates([])
+            setCandidates([]);
         }
-        setLoading(false); // ตั้งค่าสถานะการโหลดเป็น false
-    }
+        setLoading(false);
+    };
 
     useEffect(() => {
-        handelDropdownChange()
-    }, [electionType])
+        handelDropdownChange();
+    }, [electionType]);
 
     if (isLoading) {
         return (
@@ -211,7 +230,6 @@ const ManageDataCandidate = () => {
             <DigitalClock />
             <div>
                 <div className='election-form-container'>
-
                     <div className='VTitle'>
                         <img
                             loading="lazy"
@@ -237,7 +255,7 @@ const ManageDataCandidate = () => {
                             style={{ minWidth: 250, backgroundColor: '#A03939', alignItems: 'center', justifyContent: 'center' }}
                             startIcon={<img src="https://cdn-icons-png.flaticon.com/512/11039/11039795.png" alt="icon" style={{ maxWidth: 70 }} />}
                         >
-                            <span>นำเข้าข้อมูลนักศึกษา</span>
+                            <span>นำเข้าข้อมูลผู้ลงสมัคร</span>
                         </Button>
                     </label>
                 </div>
@@ -250,11 +268,9 @@ const ManageDataCandidate = () => {
                         required
                     >
                         <option value="">เลือก</option>
-                        {
-                            election.map((name, index) => (
-                                <option key={index} value={index}>{name}</option>
-                            ))
-                        }
+                        {election.map((name, index) => (
+                            <option key={index} value={index}>{name}</option>
+                        ))}
                     </select>
                 </div>
                 <TableContainer component={Paper} style={{ maxHeight: 400, overflowY: 'auto' }}>
@@ -267,6 +283,7 @@ const ManageDataCandidate = () => {
                                     <TableCell>คณะ</TableCell>
                                     <TableCell>สาขา</TableCell>
                                     <TableCell>วิสัยทัศน์</TableCell>
+                                    <TableCell>รูป</TableCell>
                                     <TableCell>แก้ไข</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -278,6 +295,9 @@ const ManageDataCandidate = () => {
                                         <TableCell>{candidate.faculty}</TableCell>
                                         <TableCell>{candidate.major}</TableCell>
                                         <TableCell>{candidate.vision}</TableCell>
+                                        <TableCell>
+                                            {candidate.image && <img src={candidate.image} alt="candidate" style={{ width: '50px' }} />}
+                                        </TableCell>
                                         <TableCell>
                                             <IconButton onClick={() => handleDelete(index)}>
                                                 <DeleteIcon />
@@ -355,6 +375,33 @@ const ManageDataCandidate = () => {
                         value={newCandidate.vision}
                         onChange={handleChange}
                     />
+                    <div style={{ marginTop: '16px' }}>
+                        <input
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            id="upload-image"
+                            type="file"
+                            onChange={handleImageChange}
+                        />
+                        <label htmlFor="upload-image">
+                            <Button
+                                variant="contained"
+                                component="span"
+                                startIcon={<PhotoCamera />}
+                            >
+                                แนบรูปภาพ
+                            </Button>
+                        </label>
+                        {imagePreview && (
+                            <div style={{ marginTop: '16px', textAlign: 'center' }}>
+                                <img
+                                    src={imagePreview}
+                                    alt="Preview"
+                                    style={{ maxWidth: '100%', maxHeight: '200px' }}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="secondary">

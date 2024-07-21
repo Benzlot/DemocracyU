@@ -10,7 +10,7 @@ import DigitalClock from '../components/DigitalClock';
 import { updateElection, deleteElection, getElectionbyName } from '../services/electionService';
 import ClipLoader from 'react-spinners/ClipLoader';
 import CircularProgress from '@mui/material/CircularProgress';
-
+import Swal from 'sweetalert2';
 
 const EditVoting = () => {
     const { account, userData, logout } = useContext(AuthContext);
@@ -23,7 +23,7 @@ const EditVoting = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
-    let state = location.state
+    const state = location.state || {};
 
     async function fetchElection(state) {
         setIsLoading(true);
@@ -33,7 +33,7 @@ const EditVoting = () => {
             setElectionType(rawData.election_type);
             setStartDate(rawData.election_start);
             setEndDate(rawData.election_end);
-            console.log(rawData)
+            console.log(rawData);
         } catch (error) {
             console.error("Failed to fetch election:", error);
         } finally {
@@ -44,7 +44,7 @@ const EditVoting = () => {
     useEffect(() => {
         fetchElection(state);
         console.log(state);
-    }, []);
+    }, [state]);
 
     const handleStartDateChange = (e) => {
         setStartDate(e.target.value);
@@ -63,6 +63,7 @@ const EditVoting = () => {
             setError('');
         }
     };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -77,11 +78,37 @@ const EditVoting = () => {
     };
 
     const handleEmergencyClose = async () => {
-        const confirmed = window.confirm(`แน่ใจที่จะปิด ${electionName} จริงหรอ ${account.name}`);
-        if (confirmed) {
-            await deleteElection(electionName);
-            console.log("Emergency close triggered");
-            navigate('/manage-voting-list');
+        const result = await Swal.fire({
+            title: 'ยืนยันการปิดการเลือกตั้ง',
+            text: `แน่ใจที่จะปิดการเลือกตั้ง ${electionName} หรือไม่?    \nคุณ ${account.name}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ยืนยัน',
+            cancelButtonText: 'ยกเลิก'
+        });
+
+
+        if (result.isConfirmed) {
+            setIsLoading(true);
+            try {
+                await deleteElection(electionName);
+                Swal.fire(
+                    'ปิดเรียบร้อย',
+                    `การเลือกตั้ง ${electionName} ถูกปิดเรียบร้อยแล้ว`,
+                    'success'
+                );
+                navigate('/manage-voting-list');
+            } catch (error) {
+                Swal.fire(
+                    'เกิดข้อผิดพลาด',
+                    'ไม่สามารถปิดการเลือกตั้งได้',
+                    'error'
+                );
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -102,6 +129,7 @@ const EditVoting = () => {
             </div>
         );
     }
+
     return (
         <div>
             <div className="navbar">
@@ -182,16 +210,19 @@ const EditVoting = () => {
                     {error && <div className="error">{error}</div>}
                     <div className="form-group button">
                         <button type="submit" className="btn btn-success" disabled={loading}>
-                            {loading ? <CircularProgress size={24} /> : 'ยืนยัน'}</button>                        
+                            {loading ? <CircularProgress size={24} /> : 'ยืนยัน'}
+                        </button>
                         <button type="button" className="btn btn-danger" onClick={() => navigate('/manage-voting-list')}>ยกเลิก</button>
                     </div>
                     <div className="form-group button">
                         <button
-                            variant="contained"
-                            component="span"
+                            type="button"
+                            className="btn btn-warning"
                             style={{ margin: 20, backgroundColor: '#A03939' }}
-                            startIcon={<img src="https://cdn-icons-png.flaticon.com/512/11039/11039795.png" alt="icon" style={{ width: 20, marginRight: 10 }} />}
-                            type="button" className="btn btn-warning" onClick={handleEmergencyClose}>ปิดการเลือกตั้งฉุกเฉิน</button>
+                            onClick={handleEmergencyClose}
+                        >
+                            ปิดการเลือกตั้งฉุกเฉิน
+                        </button>
                     </div>
                 </form>
             </div>

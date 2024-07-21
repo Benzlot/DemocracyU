@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Link,useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
@@ -8,6 +8,7 @@ import '../components-style/ManageVoting.css';
 import '../components-style/ManageDataStudent.css';
 import DigitalClock from './DigitalClock';
 import { addElection } from '../services/electionService';
+import Swal from 'sweetalert2';
 import CircularProgress from '@mui/material/CircularProgress';
 
 const ManageVoting = () => {
@@ -17,7 +18,7 @@ const ManageVoting = () => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false); // เพิ่มสถานะการโหลดนี้
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleStartDateChange = (e) => {
@@ -39,15 +40,41 @@ const ManageVoting = () => {
     };
 
     const handleConfirm = async () => {
-        setLoading(true); // ตั้งค่าสถานะการโหลดเป็น true
-        await addElection(electionName,electionType,startDate,endDate)
-        navigate('/manage-voting-list');
-        setLoading(false); // ตั้งค่าสถานะการโหลดเป็น false
+        if (!electionName || !electionType || !startDate || !endDate) {
+            Swal.fire({
+                icon: 'error',
+                title: 'ข้อมูลไม่ครบถ้วน',
+                text: 'กรุณากรอกข้อมูลให้ครบทุกช่อง!',
+                confirmButtonText: 'ตกลง'
+            });
+            return;
+        }
+
+        setLoading(true);
+        try {
+            await addElection(electionName, electionType, startDate, endDate);
+            Swal.fire({
+                icon: 'success',
+                title: 'สำเร็จ',
+                text: 'การเลือกตั้งได้ถูกเพิ่มเรียบร้อยแล้ว!',
+                confirmButtonText: 'ตกลง'
+            });
+            navigate('/manage-voting-list');
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด',
+                text: 'ไม่สามารถเพิ่มการเลือกตั้งได้',
+                confirmButtonText: 'ตกลง'
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Handle form submission logic here
+        handleConfirm();
     };
 
     return (
@@ -129,8 +156,9 @@ const ManageVoting = () => {
                     </div>
                     {error && <div className="error">{error}</div>}
                     <div className="form-group button">
-                        <button type="submit" className="btn btn-success" onClick={handleConfirm} disabled={loading}>
-                            {loading ? <CircularProgress size={24} /> : 'ยืนยัน'}</button>
+                        <button type="submit" className="btn btn-success" disabled={loading}>
+                            {loading ? <CircularProgress size={24} /> : 'ยืนยัน'}
+                        </button>
                     </div>
                 </form>
             </div>

@@ -8,6 +8,7 @@ import '../components-style/ManageVoting.css';
 import '../components-style/ManageDataStudent.css';
 import DigitalClock from '../components/DigitalClock';
 import { updateElection, deleteElection, getElectionbyName } from '../services/electionService';
+import ClipLoader from 'react-spinners/ClipLoader';
 import CircularProgress from '@mui/material/CircularProgress';
 
 
@@ -19,11 +20,13 @@ const EditVoting = () => {
     const [endDate, setEndDate] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     let state = location.state
 
     async function fetchElection(state) {
+        setIsLoading(true);
         try {
             const rawData = await getElectionbyName(state.voting.name);
             setElectionName(rawData.election_name);
@@ -33,6 +36,8 @@ const EditVoting = () => {
             console.log(rawData)
         } catch (error) {
             console.error("Failed to fetch election:", error);
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -80,7 +85,23 @@ const EditVoting = () => {
         }
     };
 
-
+    if (isLoading) {
+        return (
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh'
+            }}>
+                <ClipLoader
+                    color="#ff0000"
+                    cssOverride={{}}
+                    size={100}
+                    speedMultiplier={2}
+                />
+            </div>
+        );
+    }
     return (
         <div>
             <div className="navbar">

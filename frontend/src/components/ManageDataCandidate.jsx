@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import NavbarAdmin from '../components/NavbarAdmin';
 import DigitalClock from '../components/DigitalClock';
-import { IconButton, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import { IconButton, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField, CircularProgress } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useNavigate } from 'react-router-dom';
 import '../components-style/ManageDataStudent.css';
 import '../components-style/ManageVoting.css';
 import { getElection } from '../services/electionService';
-import { addCandidate , getCandidates , deleteCandidate } from '../services/candidateService';
+import { addCandidate, getCandidates, deleteCandidate } from '../services/candidateService';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 const ManageDataCandidate = () => {
     const [candidates, setCandidates] = useState([]);
@@ -18,22 +19,26 @@ const ManageDataCandidate = () => {
     const [open, setOpen] = useState(false);
     const [newCandidate, setNewCandidate] = useState({ name: '', studentId: '', faculty: '', major: '', vision: '' });
     const navigate = useNavigate();
-
+    const [isLoading, setIsLoading] = useState(false);
     const [election, setElection] = useState([]);
-    
+    const [loading, setLoading] = useState(false); // เพิ่มสถานะการโหลดนี้
+
     async function fetchElection() {
+        setIsLoading(true)
         try {
-          const rawData = await getElection();
-          console.log(rawData)
-          const allElection = rawData.map((election)=>{
-            return election.election_name;
-          })
-          console.log(allElection)
-          setElection(allElection); 
+            const rawData = await getElection();
+            console.log(rawData)
+            const allElection = rawData.map((election) => {
+                return election.election_name;
+            })
+            console.log(allElection)
+            setElection(allElection);
         } catch (error) {
-          console.error("Failed to fetch election:", error);
+            console.error("Failed to fetch election:", error);
+        } finally {
+            setIsLoading(false)
         }
-      }
+    }
 
     useEffect(() => {
         fetchElection();
@@ -42,7 +47,6 @@ const ManageDataCandidate = () => {
     const handleImportExcel = (event) => {
         const file = event.target.files[0];
         const reader = new FileReader();
-
 
         reader.onload = (event) => {
             const binaryStr = event.target.result;
@@ -63,6 +67,7 @@ const ManageDataCandidate = () => {
                 studentId: row[1],
                 faculty: row[2],
                 major: row[3],
+                vision: row[4]
             }));
 
             setCandidates(formattedData);
@@ -70,7 +75,7 @@ const ManageDataCandidate = () => {
 
         reader.readAsBinaryString(file);
     };
-    
+
     const handleDelete = async (index) => {
         if (electionType) {
             const electionName = election[electionType]
@@ -78,7 +83,7 @@ const ManageDataCandidate = () => {
             console.log("delete pass")
             const updatedCandidates = candidates.filter((_, i) => i !== index);
             setCandidates(updatedCandidates);
-        }else{
+        } else {
             alert('กรุณาเลือกการเลือกตั้ง');
         }
     };
@@ -109,79 +114,96 @@ const ManageDataCandidate = () => {
     const handleConfirm = async () => {
         // ตรวจสอบว่ามีการเลือก electionType หรือไม่
         if (electionType) {
+            setLoading(true); // ตั้งค่าสถานะการโหลดเป็น true
             const candidateList = createCandidate();
             const electionName = election[electionType];
             await addCandidate(electionName, candidateList);
             Swal.fire({
                 position: "center",
                 icon: "success",
-                title: "Your work has been saved",
+                title: "ดำเนินการเสร็จสิ้น",
                 showConfirmButton: false,
                 timer: 1500
-              });
-            navigate('/admin');
+            });
+            await fetchCandidates(); // Fetch the updated list of candidates
+            setLoading(false); // ตั้งค่าสถานะการโหลดเป็น false
         } else {
             // หากไม่มีการเลือก electionType แสดงการแจ้งเตือน
             alert('กรุณาเลือกการเลือกตั้ง');
         }
     };
 
-    const createCandidate =()=>{
-        return candidates.map((candidate)=>(
+    const fetchCandidates = async () => {
+        if (electionType) {
+            const electionName = election[electionType];
+            const candidatesList = await getCandidates(electionName);
+            const candidateListMapped = candidatesList.map((candidate) => ({
+                name: candidate.name,
+                studentId: candidate.student_id,
+                faculty: candidate.faculty,
+                major: candidate.major,
+                vision: candidate.vision
+            }));
+            setCandidates(candidateListMapped);
+        } else {
+            setCandidates([]);
+        }
+    };
+
+    const createCandidate = () => {
+        return candidates.map((candidate) => (
             {
-            student_id: candidate.studentId,
-            name: candidate.name,
-            faculty:candidate.faculty,
-            major:candidate.major,
-            vision:candidate.vision
+                student_id: candidate.studentId,
+                name: candidate.name,
+                faculty: candidate.faculty,
+                major: candidate.major,
+                vision: candidate.vision
             }
         ))
     }
 
-    const handelDropdownChange = async () =>{
-        if(electionType){
+    const handelDropdownChange = async () => {
+        setLoading(true); // ตั้งค่าสถานะการโหลดเป็น true
+        if (electionType) {
             const electionName = election[electionType]
             const candidatesList = await getCandidates(electionName);
-            const candidateListMapped = candidatesList.map((candidate)=>(
-                {   
-                    name: candidate.name, 
-                    studentId: candidate.student_id, 
-                    faculty: candidate.faculty, 
+            const candidateListMapped = candidatesList.map((candidate) => (
+                {
+                    name: candidate.name,
+                    studentId: candidate.student_id,
+                    faculty: candidate.faculty,
                     major: candidate.major,
                     vision: candidate.vision
                 }
             ))
             setCandidates(candidateListMapped);
-        }else{
+        } else {
             setCandidates([])
         }
+        setLoading(false); // ตั้งค่าสถานะการโหลดเป็น false
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         handelDropdownChange()
-    },[electionType])
-    // ฟังก์ชันสำหรับบันทึกข้อมูล (ตัวอย่าง)
-    // const saveData = async (data) => {
-    //     try {
-    //         // ตัวอย่างการบันทึกข้อมูลไปยังเซิร์ฟเวอร์
-    //         const response = await fetch('/api/save-election', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify(data),
-    //         });
+    }, [electionType])
 
-    //         if (!response.ok) {
-    //             throw new Error('Network response was not ok');
-    //         }
-
-    //         return await response.json();
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // };
-
+    if (isLoading) {
+        return (
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh'
+            }}>
+                <ClipLoader
+                    color="#ff0000"
+                    cssOverride={{}}
+                    size={100}
+                    speedMultiplier={2}
+                />
+            </div>
+        );
+    }
 
     return (
         <>
@@ -212,8 +234,8 @@ const ManageDataCandidate = () => {
                         <Button
                             variant="contained"
                             component="span"
-                            style={{ minWidth: 250, backgroundColor: '#A03939', alignItems: 'center',justifyContent: 'center' }}
-                            startIcon={<img src="https://cdn-icons-png.flaticon.com/512/11039/11039795.png" alt="icon" style={{ maxWidth: 70}} />}
+                            style={{ minWidth: 250, backgroundColor: '#A03939', alignItems: 'center', justifyContent: 'center' }}
+                            startIcon={<img src="https://cdn-icons-png.flaticon.com/512/11039/11039795.png" alt="icon" style={{ maxWidth: 70 }} />}
                         >
                             <span>นำเข้าข้อมูลนักศึกษา</span>
                         </Button>
@@ -229,41 +251,43 @@ const ManageDataCandidate = () => {
                     >
                         <option value="">เลือก</option>
                         {
-                            election.map((name, index)=>(
-                                <option value={index}>{name}</option>
+                            election.map((name, index) => (
+                                <option key={index} value={index}>{name}</option>
                             ))
                         }
                     </select>
                 </div>
                 <TableContainer component={Paper} style={{ maxHeight: 400, overflowY: 'auto' }}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>ชื่อ</TableCell>
-                                <TableCell>รหัสประจำตัวนักศึกษา</TableCell>
-                                <TableCell>คณะ</TableCell>
-                                <TableCell>สาขา</TableCell>
-                                <TableCell>วิสัยทัศน์</TableCell>
-                                <TableCell>แก้ไข</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {candidates.map((candidate, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{candidate.name}</TableCell>
-                                    <TableCell>{candidate.studentId}</TableCell>
-                                    <TableCell>{candidate.faculty}</TableCell>
-                                    <TableCell>{candidate.major}</TableCell>
-                                    <TableCell>{candidate.vision}</TableCell>
-                                    <TableCell>
-                                        <IconButton onClick={() => handleDelete(index)}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </TableCell>
+                    {loading ? <CircularProgress style={{ display: 'flex', justifyContent: 'center', padding: '20px' }} /> : (
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>ชื่อ</TableCell>
+                                    <TableCell>รหัสประจำตัวนักศึกษา</TableCell>
+                                    <TableCell>คณะ</TableCell>
+                                    <TableCell>สาขา</TableCell>
+                                    <TableCell>วิสัยทัศน์</TableCell>
+                                    <TableCell>แก้ไข</TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHead>
+                            <TableBody>
+                                {candidates.map((candidate, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{candidate.name}</TableCell>
+                                        <TableCell>{candidate.studentId}</TableCell>
+                                        <TableCell>{candidate.faculty}</TableCell>
+                                        <TableCell>{candidate.major}</TableCell>
+                                        <TableCell>{candidate.vision}</TableCell>
+                                        <TableCell>
+                                            <IconButton onClick={() => handleDelete(index)}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    )}
                 </TableContainer>
                 <div className='VTitle'>
                     <Button
@@ -277,7 +301,8 @@ const ManageDataCandidate = () => {
                     </Button>
                 </div>
                 <div className="form-group button">
-                    <button type="submit" className="btn btn-success" onClick={handleConfirm}>ยืนยัน</button>
+                    <button type="submit" className="btn btn-success" onClick={handleConfirm} disabled={loading}>
+                        {loading ? <CircularProgress size={24} /> : 'ยืนยัน'}</button>
                 </div>
             </div>
 

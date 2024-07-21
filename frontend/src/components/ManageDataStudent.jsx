@@ -10,6 +10,8 @@ import '../components-style/ManageDataStudent.css';
 import { getElection } from '../services/electionService';
 import { addVoter, getVoter, deleteVoter } from '../services/voterService';
 import Swal from 'sweetalert2'
+import ClipLoader from 'react-spinners/ClipLoader';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const ManageDataStudent = () => {
     const [students, setStudents] = useState([]);
@@ -18,25 +20,23 @@ const ManageDataStudent = () => {
     const [newStudent, setNewStudent] = useState({ name: '', studentId: '', faculty: '', major: '' });
     const [election, setElection] = useState([]);
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [loading, setLoading] = useState(false); // เพิ่มสถานะการโหลดนี้
+
     async function fetchElection() {
+        setIsLoading(true);
         try {
-          const rawData = await getElection();
-          console.log(rawData)
-          const allElection = rawData.map((election)=>{
-            return election.election_name;
-          })
-          console.log(allElection)
-          setElection(allElection); 
-        //   if (Array.isArray(rawData)) {
-        //     const data = mapElection(rawData);
-        //       setElection(data);
-        //   } else {
-        //     console.error("Expected an array but got:", rawData);
-        //   }
+            const rawData = await getElection();
+            const allElection = rawData.map((election) => {
+                return election.election_name;
+            });
+            setElection(allElection);
         } catch (error) {
-          console.error("Failed to fetch election:", error);
+            console.error("Failed to fetch election:", error);
+        } finally {
+            setIsLoading(false);
         }
-      }
+    }
 
     useEffect(() => {
         fetchElection();
@@ -46,7 +46,6 @@ const ManageDataStudent = () => {
         const file = event.target.files[0];
         const reader = new FileReader();
 
-
         reader.onload = (event) => {
             const binaryStr = event.target.result;
             const workbook = XLSX.read(binaryStr, { type: 'binary' });
@@ -54,13 +53,8 @@ const ManageDataStudent = () => {
             const sheet = workbook.Sheets[sheetName];
             const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-            // ตรวจสอบโครงสร้างของข้อมูลที่อ่านได้
-            console.log(data);
-
-            // ลบแถวหัวเรื่องออกและกรอง row ที่ไม่มีข้อมูล
             const rows = data.slice(1).filter(row => row.some(cell => cell));
 
-            // ตั้งค่าข้อมูลใน state
             const formattedData = rows.map(row => ({
                 name: row[0],
                 studentId: row[1],
@@ -74,14 +68,14 @@ const ManageDataStudent = () => {
         reader.readAsBinaryString(file);
     };
 
-    const handleDelete = async(index) => {
+    const handleDelete = async (index) => {
         if (electionType) {
-            const electionName = election[electionType]
-            await deleteVoter(electionName, students[index].studentId)
+            const electionName = election[electionType];
+            await deleteVoter(electionName, students[index].studentId);
 
             const updatedStudents = students.filter((_, i) => i !== index);
             setStudents(updatedStudents);
-        }else{
+        } else {
             alert('กรุณาเลือกการเลือกตั้ง');
         }
     };
@@ -109,59 +103,92 @@ const ManageDataStudent = () => {
     };
 
     const handleConfirm = async () => {
-        // ตรวจสอบว่ามีการเลือก electionType หรือไม่
         if (electionType) {
+            setLoading(true); // ตั้งค่าสถานะการโหลดเป็น true
             const studentList = createStudent();
             const electionName = election[electionType];
-            await addVoter(electionName,studentList);
-            //Sweetalert add
+            await addVoter(electionName, studentList);
             Swal.fire({
                 position: "center",
                 icon: "success",
                 title: "ดำเนินการเสร็จสิ้น",
                 showConfirmButton: false,
                 timer: 1500
-              });
-            navigate('/admin');
-            console.log(electionType);
+            });
+            await fetchStudents();
+            setLoading(false); // ตั้งค่าสถานะการโหลดเป็น false
         } else {
-            // หากไม่มีการเลือก electionType แสดงการแจ้งเตือน
             alert('กรุณาเลือกการเลือกตั้ง');
         }
     };
 
-    const handelDropdownChange = async () =>{
-        if(electionType){
-            const electionName = election[electionType]
+    const fetchStudents = async () => {
+        if (electionType) {
+            const electionName = election[electionType];
             const studentsList = await getVoter(electionName);
-            const studentListMapped = studentsList.map((student)=>(
-                {   
-                    name: student.name, 
-                    studentId: student.student_id, 
-                    faculty: student.faculty, 
+            const studentListMapped = studentsList.map((student) => ({
+                name: student.name,
+                studentId: student.student_id,
+                faculty: student.faculty,
+                major: student.major
+            }));
+            setStudents(studentListMapped);
+        } else {
+            setStudents([]);
+        }
+    };
+    const handelDropdownChange = async () => {
+        setLoading(true); // ตั้งค่าสถานะการโหลดเป็น true
+        if (electionType) {
+            const electionName = election[electionType];
+            const studentsList = await getVoter(electionName);
+            const studentListMapped = studentsList.map((student) => (
+                {
+                    name: student.name,
+                    studentId: student.student_id,
+                    faculty: student.faculty,
                     major: student.major
                 }
-            ))
+            ));
             setStudents(studentListMapped);
-        }else{
-            setStudents([])
+        } else {
+            setStudents([]);
         }
+        setLoading(false); // ตั้งค่าสถานะการโหลดเป็น false
     }
 
-    useEffect(()=>{
-        handelDropdownChange()
-    },[electionType])
+    useEffect(() => {
+        handelDropdownChange();
+    }, [electionType]);
 
-    const createStudent =()=>{
-        return students.map((student)=>(
+    const createStudent = () => {
+        return students.map((student) => (
             {
-            student_id: student.studentId,
-            name: student.name,
-            faculty:student.faculty,
-            major:student.major,
-            mail: student.studentId+"@stu.pim.ac.th"
+                student_id: student.studentId,
+                name: student.name,
+                faculty: student.faculty,
+                major: student.major,
+                mail: student.studentId + "@stu.pim.ac.th"
             }
-        ))
+        ));
+    }
+
+    if (isLoading) {
+        return (
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh'
+            }}>
+                <ClipLoader
+                    color="#ff0000"
+                    cssOverride={{}}
+                    size={100}
+                    speedMultiplier={2}
+                />
+            </div>
+        );
     }
 
     return (
@@ -188,18 +215,16 @@ const ManageDataStudent = () => {
                         type="file"
                         onChange={handleImportExcel}
                     />
-                    <div className='Vtitle'>
                     <label htmlFor="upload-file">
                         <Button
                             variant="contained"
                             component="span"
-                            // className='exp'
-                            style={{ minWidth: 250, backgroundColor: '#A03939', alignItems: 'center',justifyContent: 'center' }}
-                            startIcon={<img src="https://cdn-icons-png.flaticon.com/512/11039/11039795.png" alt="icon" style={{ maxWidth: 70 }} />}>
+                            style={{ minWidth: 250, backgroundColor: '#A03939', alignItems: 'center', justifyContent: 'center' }}
+                            startIcon={<img src="https://cdn-icons-png.flaticon.com/512/11039/11039795.png" alt="icon" style={{ maxWidth: 70 }} />}
+                        >
                             <span>นำเข้าข้อมูลนักศึกษา</span>
                         </Button>
                     </label>
-                    </div>
                 </div>
                 <div className="form-group">
                     <label htmlFor="electionType">เลือกการเลือกตั้ง:</label>
@@ -211,39 +236,41 @@ const ManageDataStudent = () => {
                     >
                         <option value="">เลือก</option>
                         {
-                            election.map((name, index)=>(
-                                <option value={index}>{name}</option> 
+                            election.map((name, index) => (
+                                <option key={index} value={index}>{name}</option>
                             ))
                         }
                     </select>
                 </div>
                 <TableContainer component={Paper} style={{ maxHeight: 400, overflowY: 'auto' }}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>ชื่อ</TableCell>
-                                <TableCell>รหัสประจำตัวนักศึกษา</TableCell>
-                                <TableCell>คณะ</TableCell>
-                                <TableCell>สาขา</TableCell>
-                                <TableCell>แก้ไข</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {students.map((student, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{student.name}</TableCell>
-                                    <TableCell>{student.studentId}</TableCell>
-                                    <TableCell>{student.faculty}</TableCell>
-                                    <TableCell>{student.major}</TableCell>
-                                    <TableCell>
-                                        <IconButton onClick={() => handleDelete(index)}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </TableCell>
+                    {loading ? <CircularProgress style={{ display: 'flex', justifyContent: 'center', padding: '20px' }} /> : (
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>ชื่อ</TableCell>
+                                    <TableCell>รหัสประจำตัวนักศึกษา</TableCell>
+                                    <TableCell>คณะ</TableCell>
+                                    <TableCell>สาขา</TableCell>
+                                    <TableCell>แก้ไข</TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHead>
+                            <TableBody>
+                                {students.map((student, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{student.name}</TableCell>
+                                        <TableCell>{student.studentId}</TableCell>
+                                        <TableCell>{student.faculty}</TableCell>
+                                        <TableCell>{student.major}</TableCell>
+                                        <TableCell>
+                                            <IconButton onClick={() => handleDelete(index)}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    )}
                 </TableContainer>
                 <div className='VTitle'>
                     <Button
@@ -257,7 +284,8 @@ const ManageDataStudent = () => {
                     </Button>
                 </div>
                 <div className="form-group button">
-                    <button type="submit" className="btn btn-success" onClick={handleConfirm}>ยืนยัน</button>
+                    <button type="submit" className="btn btn-success" onClick={handleConfirm} disabled={loading}>
+                        {loading ? <CircularProgress size={24} /> : 'ยืนยัน'}</button>
                 </div>
             </div>
 

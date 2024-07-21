@@ -8,6 +8,7 @@ import '../components-style/ManageVoting.css';
 import '../components-style/ManageDataStudent.css';
 import DigitalClock from './DigitalClock';
 import { addElection } from '../services/electionService';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const ManageVoting = () => {
     const { account, userData, logout } = useContext(AuthContext);
@@ -16,6 +17,7 @@ const ManageVoting = () => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false); // เพิ่มสถานะการโหลดนี้
     const navigate = useNavigate();
 
     const handleStartDateChange = (e) => {
@@ -37,8 +39,10 @@ const ManageVoting = () => {
     };
 
     const handleConfirm = async () => {
+        setLoading(true); // ตั้งค่าสถานะการโหลดเป็น true
         await addElection(electionName,electionType,startDate,endDate)
         navigate('/manage-voting-list');
+        setLoading(false); // ตั้งค่าสถานะการโหลดเป็น false
     };
 
     const handleSubmit = (e) => {
@@ -125,7 +129,8 @@ const ManageVoting = () => {
                     </div>
                     {error && <div className="error">{error}</div>}
                     <div className="form-group button">
-                        <button type="submit" className="btn btn-success" onClick={handleConfirm}>ยืนยัน</button>
+                        <button type="submit" className="btn btn-success" onClick={handleConfirm} disabled={loading}>
+                            {loading ? <CircularProgress size={24} /> : 'ยืนยัน'}</button>
                     </div>
                 </form>
             </div>

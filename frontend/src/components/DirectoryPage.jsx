@@ -13,6 +13,7 @@ const DirectoryPage = () => {
   }, []);
 
   async function fetchCandidates() {
+    //try catch here
     setIsLoading(true)
     const rawData = await getCandidates()
     // ข้อมูลตัวอย่าง

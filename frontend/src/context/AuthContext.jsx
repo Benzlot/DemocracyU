@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import { PublicClientApplication } from '@azure/msal-browser';
 import { msalConfig, loginRequest, graphConfig } from '../config/msalConfig';
 import { checkAdmin } from '../services/authService';
+import { getVoterByMail } from '../services/voterService';
 import axios from 'axios';
 
 export const AuthContext = createContext();
@@ -67,7 +68,7 @@ export const AuthProvider = ({ children }) => {
         ...loginRequest,
         account,
       });
-      const userResponse = await axios.get(graphConfig.graphMeEndpoint, {
+      let userResponse = await axios.get(graphConfig.graphMeEndpoint, {
         headers: {
           Authorization: `Bearer ${tokenResponse.accessToken}`,
         },
@@ -75,6 +76,11 @@ export const AuthProvider = ({ children }) => {
 
       const scanAdmin = await checkAdmin(userResponse.data.userPrincipalName);
       setIsAdmin(scanAdmin ? true : false);
+
+      let userData = await getVoterByMail(userResponse.data.userPrincipalName)
+      // console.log("userData:",userData)
+      userResponse.data.electionName = userData.election_name
+      userResponse.data.status = userData.status
 
       const photoResponse = await axios.get(`${graphConfig.graphMeEndpoint}/photo/$value`, {
         headers: {

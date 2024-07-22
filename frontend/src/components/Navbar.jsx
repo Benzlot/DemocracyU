@@ -3,12 +3,30 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
+import { getVoterByMail } from '../services/voterService';
 
 const Navbar = () => {
   const { account, userData, logout } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  async function fetchVoterData() {
+    setIsLoading(true)
+    try {
+      // console.log(account)
+      let rawVoter = await getVoterByMail(account.username);
+      //handel error here
+      setIsLoading(true)
+      setElectionName(rawVoter.election_name)
+      setStatus(rawVoter.status)
 
+    } catch (error) {
+      //alert ---
+      console.error("Failed to fetch voter data:", error);
+    } finally {
+      setIsLoading(false)
+    }
+  }
+  
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -56,7 +74,7 @@ const Navbar = () => {
       {account && (
         <div className={`dashboard-navbar ${isMenuOpen ? 'open' : ''}`}>
           <Link to="/directory" className="nav-link" onClick={toggleMenu}>ทำเนียบนักศึกษา</Link>
-          <Link to="/results" className="nav-link" onClick={toggleMenu}>ผลการเลือกตั้ง</Link>
+          <Link to="/results" className="nav-link" >ผลการเลือกตั้ง</Link>
           <Link to="/evaluationPage" className="nav-link" onClick={toggleMenu}>ประเมินเว็ปไซต์</Link>
         </div>
       )}

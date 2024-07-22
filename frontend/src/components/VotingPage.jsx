@@ -15,30 +15,11 @@ import ClipLoader from 'react-spinners/ClipLoader';
 
 const VotingPage = () => {
   const { account, userData, logout } = useContext(AuthContext);
-  const [votes, setVotes] = useState([]);
-  const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const [electionName, setElectionName] = useState('');
-  const [status, setStatus] = useState('');
+  const [votes, setVotes] = useState([]);// เก็บ Candidate
+  const [electionName, setElectionName] = useState(userData.electionName);
+  const [status, setStatus] = useState(userData.status);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate()
-
-
-  async function fetchVoterData() {
-    setIsLoading(true)
-    try {
-      // console.log(account)
-      let rawVoter = await getVoterByMail(account.username);
-      //handel error here
-      setIsLoading(true)
-      setElectionName(rawVoter.election_name)
-      setStatus(rawVoter.status)
-
-    } catch (error) {
-      console.error("Failed to fetch voter data:", error);
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   async function fetchCandidate() {
     setIsLoading(true)
@@ -47,6 +28,7 @@ const VotingPage = () => {
       let mappedCandidate = mapCandidate(rawCandidate);
       setVotes(mappedCandidate)
     } catch (error) {
+      //alert
       console.error("Failed to fetch candidate:", error);
     } finally {
       setIsLoading(false)
@@ -54,17 +36,14 @@ const VotingPage = () => {
   }
 
   useEffect(() => {
-    fetchVoterData();
-  }, []);
-
-  useEffect(() => {
     console.log(electionName, status)
-    if (status === "0") {
+    userData.status = status;
+    if (status == "0") {
       fetchCandidate();
-    } else if (status === "1") {
-      navigate('/results', { state: { electionName } })
+    } else if (status == "1") {
+      navigate('/results')
     }
-  }, [electionName, status]);
+  }, [status]);
 
   const mapCandidate = (rawData) => {
     return rawData
@@ -84,6 +63,7 @@ const VotingPage = () => {
       await castVote(electionName, id, account.name, account.username);
       alert('Vote cast successfully!');
     } catch (error) {
+      //alert---
       console.error('Failed to cast vote:', error);
       // alert('Failed to cast vote. Please try again.');
     }
@@ -92,17 +72,16 @@ const VotingPage = () => {
     // }
   };
 
-  const handleOnSelect = async (id) => {
-    setSelectedCandidate(id)
+  const handleOnSelect = async (vote) => {
     const { value: email } = await Swal.fire({
-      title: `กรุณากรอกอีเมลสถาบันเพื่อยืนยันการเลือกเบอร์ ${id}`,
+      title: vote.id == 0 ?"กรุณากรอกอีเมลสถาบันเพื่อยืนยันการเลือกไม่ประสงลงคะแนน" :`กรุณากรอกอีเมลสถาบันเพื่อยืนยันการเลือกคุณ ${vote.candidateName}`,
       input: "email",
       inputLabel: `Your email address`,
       inputPlaceholder: account.username
     });
     if (email === account.username) {
       Swal.fire(`Entered email: ${email}`);
-      await handleVote(id)
+      await handleVote(vote.id)
       setStatus(1)
     } else {
       Swal.fire(`Email not match`);
@@ -163,7 +142,7 @@ const VotingPage = () => {
           className="VImg"
           alt=""
         />
-        <div className='Votename'><h1>ลงคะแนนการเลือกตั้ง</h1></div>
+        <div className='Votename'><h1>ลงคะแนนการเลือกตั้ง ${electionName}</h1></div>
       </div>
 
       <div className="container">
@@ -173,12 +152,12 @@ const VotingPage = () => {
             imageSrc={vote.imageSrc}
             name={vote.candidateName}
             description={vote.description}
-            onSelect={() => handleOnSelect(vote.id)}
+            onSelect={() => handleOnSelect(vote)}
           />
         ))}
       </div>
 
-      <button onClick={() => handleVote(0)} disabled={!selectedCandidate} className="submitButton">ไม่ประสงค์ลงคะแนน</button>
+      <button onClick={() => handleOnSelect({id : 0})} className="submitButton">ไม่ประสงค์ลงคะแนน</button>
     </div>
   );
 };

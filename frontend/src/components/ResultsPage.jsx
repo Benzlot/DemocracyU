@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import 'chart.js/auto';
 import { useSpring, animated, useTransition } from 'react-spring';
@@ -9,29 +9,22 @@ import { getCandidates } from '../services/candidateService';
 import { getVotes } from '../services/votingService';
 import { getStatus } from '../services/voterService';
 import ClipLoader from 'react-spinners/ClipLoader';
+import { AuthContext } from '../context/AuthContext';
 
 const ResultsPage = () => {
+  const { account, userData, logout } = useContext(AuthContext);
   const [totalVotes, setTotalVotes] = useState('');
   const [nonVotes, setNonVotes] = useState('') // Assume a total of 1000 eligible voters
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
-  // const electionName = location.electionName || '';
-
-  const initialVotes = [
-    { name: 'Pakin Chanpom', votes: 200 },
-    { name: 'Worameth Tantithanawong', votes: 150 },
-    { name: 'Akkharaset Khamson', votes: 50 },
-    { name: 'ไม่ประสงค์ลงคะแนน', votes: 50 },
-  ];
-
-
   const [candidateVotes, setCandidateVotes] = useState("");
 
   const sortedCandidates = [...candidateVotes].sort((a, b) => b.votes - a.votes);
 
   async function fetchCandidate() {
-    setIsLoading(true)
-      const { electionName } = location.state || '';
+  try{
+      setIsLoading(true)
+      const electionName = userData.electionName;
       console.log(electionName)
       let rawCandidate = await getCandidates(electionName);
       let mappedCandidate = mapCandidate(rawCandidate);
@@ -45,13 +38,16 @@ const ResultsPage = () => {
       setNonVotes(nonVote)
       setTotalVotes(vote)
       setIsLoading(false)
-
+    }catch(error){
+      //alert 
+      console.log(error)
+    }
   }
 
   const mapCandidate = (rawData) => {
     return rawData.map((data) => ({
       id: data.id, // Assuming id is unique and can be used as key
-      imageSrc: `/uploads/${data.img.path}` || 'https://i.imghippo.com/files/YeJ7o1721571932.png', // Example placeholder URL
+      imageSrc: `/uploads/${data.img?.path}` || 'https://i.imghippo.com/files/YeJ7o1721571932.png', // Example placeholder URL
       name: data.name || 'Candidate Name',
     }));
   };
@@ -68,12 +64,11 @@ const ResultsPage = () => {
     }));
   }
 
-
   useEffect(() => {
     fetchCandidate();
 
     // Set interval to fetch every minute
-    // const intervalId = setInterval(fetchCandidate, 3000);
+    const intervalId = setInterval(fetchCandidate, 60000);
 
     // Cleanup interval on component unmount
     return () => clearInterval(intervalId);

@@ -35,6 +35,7 @@ const EditVoting = () => {
             setEndDate(rawData.election_end);
             console.log(rawData);
         } catch (error) {
+            //alert
             console.error("Failed to fetch election:", error);
         } finally {
             setIsLoading(false);
@@ -71,6 +72,7 @@ const EditVoting = () => {
             await updateElection(electionName, electionType, startDate, endDate);
             navigate('/manage-voting-list');
         } catch (error) {
+            //alert here
             console.error(error);
         } finally {
             setLoading(false);

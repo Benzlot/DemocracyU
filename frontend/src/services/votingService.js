@@ -9,6 +9,13 @@ export const getVotes = async (election_name) => {
   return response.data;
 };
 
+export const getRank = async (election_name) => {
+  const response = await axios.post(`${API_URL}/getRank`,{
+    election_name : election_name,
+  });
+  return response.data;
+};
+
 export const castVote = async (election_name ,candidate_Id, username, mail) => {
   const response = await axios.post(`${API_URL}/vote`, { 
       election_name : election_name,

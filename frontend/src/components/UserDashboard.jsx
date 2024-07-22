@@ -1,7 +1,12 @@
-import React from 'react';
+import React  ,{useEffect,useContext} from 'react';
+import { AuthContext } from '../context/AuthContext';
 import { Link } from 'react-router-dom'; // Assuming you're using react-router-dom
 
 const UserDashboard = () => {
+  const { account, userData, logout } = useContext(AuthContext);
+  useEffect(() => {
+    console.log("userData",userData);
+  }, [userData]);
   return (
     <div className="dashboard-container">
       <img

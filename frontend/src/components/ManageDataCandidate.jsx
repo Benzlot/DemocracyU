@@ -36,6 +36,7 @@ const ManageDataCandidate = () => {
             console.log(allElection)
             setElection(allElection);
         } catch (error) {
+            //alert here
             console.error("Failed to fetch election:", error);
         } finally {
             setIsLoading(false)
@@ -49,6 +50,7 @@ const ManageDataCandidate = () => {
    
     const handleDelete = async (index) => {
         if (electionType) {
+            //add try catch here
             const electionName = election[electionType]
             await deleteCandidate(electionName, candidates[index].studentId)
             console.log("delete pass")
@@ -105,6 +107,7 @@ const ManageDataCandidate = () => {
     };
 
     const handleConfirm = async () => {
+        //add try catch here
         if (electionType) {
             setLoading(true);
             const formData = new FormData();
@@ -136,17 +139,20 @@ const ManageDataCandidate = () => {
     };
 
     const fetchCandidates = async () => {
+        //add try catch here
         if (electionType) {
             const electionName = election[electionType];
             const candidatesList = await getCandidates(electionName);
             // console.log(candidatesList[0].img.path)
-            const candidateListMapped = candidatesList.map((candidate) => ({
-                name: candidate.name,
-                studentId: candidate.student_id,
-                faculty: candidate.faculty,
-                major: candidate.major,
-                vision: candidate.vision,
-                image: `/uploads/${candidate.img.path}`
+            const candidateListMapped = candidatesList
+                .filter(candidate => candidate.student_id !== 0)
+                .map(candidate => ({
+                    name: candidate.name,
+                    studentId: candidate.student_id,
+                    faculty: candidate.faculty,
+                    major: candidate.major,
+                    vision: candidate.vision,
+                    image: `/uploads/${candidate.img.path}`
             }));
 
             setCandidates(candidateListMapped);
@@ -168,6 +174,7 @@ const ManageDataCandidate = () => {
     };
 
     const handelDropdownChange = async () => {
+        //add try catch here
         setLoading(true);
         if (electionType) {
 

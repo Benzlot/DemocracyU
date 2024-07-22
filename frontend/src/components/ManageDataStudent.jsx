@@ -32,6 +32,7 @@ const ManageDataStudent = () => {
             });
             setElection(allElection);
         } catch (error) {
+            //alert
             console.error("Failed to fetch election:", error);
         } finally {
             setIsLoading(false);
@@ -70,6 +71,7 @@ const ManageDataStudent = () => {
 
     const handleDelete = async (index) => {
         if (electionType) {
+            //add try catch
             const electionName = election[electionType];
             await deleteVoter(electionName, students[index].studentId);
 
@@ -104,6 +106,7 @@ const ManageDataStudent = () => {
 
     const handleConfirm = async () => {
         if (electionType) {
+            //add try catch
             setLoading(true); // ตั้งค่าสถานะการโหลดเป็น true
             const studentList = createStudent();
             const electionName = election[electionType];

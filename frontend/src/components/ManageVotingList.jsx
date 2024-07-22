@@ -30,6 +30,7 @@ const ManageVotingList = () => {
                 console.error("Expected an array but got:", rawData);
             }
         } catch (error) {
+            //alert
             console.error("Failed to fetch election:", error);
         } finally{
             setIsLoading(false)

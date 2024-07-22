@@ -1,44 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import '../components-style/DirectP.css'
+// components/DirectoryPage.jsx
+import React, { useState, useEffect, useContext } from 'react';
 import { getCandidates } from '../services/candidateService';
-import CandidateRank from './CandidateRank';
+import { getVotes } from '../services/votingService';
 import ClipLoader from 'react-spinners/ClipLoader';
+import { AuthContext } from '../context/AuthContext';
+import CandidateRank from './CandidateRank';
+import '../components-style/DirectP.css';
 
 const DirectoryPage = () => {
-  const [candidates, setCandidates] = useState([]);
+  const { userData } = useContext(AuthContext);
+  const [highestCandidate, setHighestCandidate] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    fetchCandidates();
-  }, []);
-
-  async function fetchCandidates() {
-    //try catch here
-    setIsLoading(true)
-    const rawData = await getCandidates()
-    // ข้อมูลตัวอย่าง
-    const data = mapCandidate(rawData)
-    setCandidates(data);
-    setIsLoading(false)
+  async function fetchCandidateWithHighestVotes() {
+    setIsLoading(true);
+    try {
+      const electionName = userData.electionName;
+      console.log('Fetching candidates for election:', electionName);
+      let rawCandidates = await getCandidates(electionName);
+      console.log('Raw candidates:', rawCandidates);
+      let rawVotes = await getVotes(electionName);
+      console.log('Raw votes:', rawVotes);
+      let candidatesWithVotes = mergeCounts(rawCandidates, rawVotes);
+      console.log('Candidates with votes:', candidatesWithVotes);
+      let highest = getHighestVoteCandidate(candidatesWithVotes);
+      console.log('Highest vote candidate:', highest);
+      setHighestCandidate(highest);
+    } catch (error) {
+      console.error('Failed to fetch candidate data:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  const mapCandidate = (rawData) => {
-    const mappedData = rawData.map((data) => {
-      let map = {
-        id: parseInt(data.id, 10),//cast String to int 
-        imageSrc: 'https://via.placeholder.com/150',
-        candidateName: data.name,
-        description: data.vision
-      }
+  useEffect(() => {
+    fetchCandidateWithHighestVotes();
+  }, []);
 
-      return map
-    })
+  function mergeCounts(candidates, votes) {
+    const countMap = votes.reduce((acc, item) => {
+      acc[item._id] = item.count;
+      return acc;
+    }, {});
 
-    return mappedData
+    return candidates.map(candidate => ({
+      ...candidate,
+      votes: countMap[candidate.id] || 0,
+    }));
+  }
+
+  function getHighestVoteCandidate(candidates) {
+    return candidates.reduce((max, candidate) => (candidate.votes > max.votes ? candidate : max), candidates[0]);
   }
 
   if (isLoading) {
-    // Render spinner while loading
     return (
       <div style={{
         display: 'flex',
@@ -57,10 +72,18 @@ const DirectoryPage = () => {
   }
 
   return (
-    <div className='text-align'>
-      <div className='Directory'><h1>ทำเนียบนักศึกษา</h1></div>
-      <CandidateRank />
-
+    <div className="directory-page">
+      <div className='DirectTitle'><h1>ทำเนียบนักศึกษา</h1></div>
+      {highestCandidate ? (
+        <CandidateRank
+          key={highestCandidate.id}
+          imageSrc={highestCandidate.imageSrc}
+          name={highestCandidate.name}
+          description={highestCandidate.vision}
+        />
+      ) : (
+        <p>No candidate data available.</p>
+      )}
     </div>
   );
 };

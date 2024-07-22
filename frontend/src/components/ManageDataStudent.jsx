@@ -60,7 +60,7 @@ const ManageDataStudent = () => {
                 name: row[0],
                 studentId: row[1],
                 faculty: row[2],
-                major: row[3],
+                major: row[3]
             }));
 
             setStudents(formattedData);

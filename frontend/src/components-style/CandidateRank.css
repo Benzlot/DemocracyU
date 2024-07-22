@@ -1,27 +1,33 @@
-.card {
+/* components-style/CandidateRank.css */
+.candidate-rank-card {
     border: 1px solid #ddd;
+    padding-top: 5vw;
+    padding-bottom: 5vw;
     border-radius: 8px;
-    padding: 16px;
     text-align: center;
-    margin: 16px;
-    width: 200px;
-}
-.candidate{
-justify-content: center;
-}
-
-.card img {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-}
-
-.card button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    background-color: #8B0000;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
+    margin-left: 5rem;
+    margin-right: 2re;
+    width: 20vw;
+  }
+  
+  .candidate-rank-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    
+  }
+  
+  .candidate-rank-info {
+    flex-grow: 1;
+  }
+  
+  .candidate-rank-info h2 {
+    margin: 0;
+    font-size: 1.5em;
+  }
+  
+  .candidate-rank-info p {
+    margin: 0;
+    color: #666;
+  }
+  

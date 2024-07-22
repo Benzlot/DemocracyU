@@ -5,6 +5,7 @@ const { checkNotEmpty ,checkIfEmpty } = require('../Service/commonService');
 const mongoose = require('mongoose');
 const fs = require("fs");
 const path = require("path");
+
 async function getCandidates  (req, res) {
   try {
 
@@ -19,10 +20,15 @@ async function getCandidates  (req, res) {
 
     let election = await Election.findOne({election_name : election_name});
     checkIfEmpty(election, "Election not found")
-      
     let candidates = await Candidate.find({election_name : election_name});
-
+    
     console.log("candidates ==> ",candidates)
+    // if (!checkIsStart(election)) {
+    //   throw new Error("Election not start yet"); // edit error text
+    // }
+    // if (checkIsEnd(election)) {
+    //   throw new Error("Election has been ended"); // edit error text
+    // }
     res.status(200).json(candidates);
   } catch (error) {
     console.log(error)

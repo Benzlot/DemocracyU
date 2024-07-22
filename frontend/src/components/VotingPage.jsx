@@ -142,7 +142,7 @@ const VotingPage = () => {
           className="VImg"
           alt=""
         />
-        <div className='Votename'><h1>ลงคะแนนการเลือกตั้ง ${electionName}</h1></div>
+        <div className='Votename'><h1>ลงคะแนนการเลือกตั้ง {electionName} </h1></div>
       </div>
 
       <div className="container">

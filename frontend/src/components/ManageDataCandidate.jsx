@@ -145,7 +145,7 @@ const ManageDataCandidate = () => {
             const candidatesList = await getCandidates(electionName);
             // console.log(candidatesList[0].img.path)
             const candidateListMapped = candidatesList
-                .filter(candidate => candidate.student_id !== 0)
+                .filter(candidate => candidate.student_id !== "00" )
                 .map(candidate => ({
                     name: candidate.name,
                     studentId: candidate.student_id,

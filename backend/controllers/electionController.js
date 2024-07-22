@@ -74,7 +74,7 @@ async function addElection (req, res) {
 
     let addedCandidate = new Candidate({
       id: 0,
-      name: "ไม่ประสงลงคะแนน",
+      name: "ไม่ประสงค์ลงคะแนน",
       student_id: "00",
       faculty: "00",
       major: "00",

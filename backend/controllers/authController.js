@@ -19,7 +19,7 @@ async function checkAdmin (req, res) {
 
     res.status(200).json(admin);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch candidates' });
+    res.status(500).json({ error: error.message||'Failed to fetch candidates' });
   } finally {
     mongoose.connection.close();
   }

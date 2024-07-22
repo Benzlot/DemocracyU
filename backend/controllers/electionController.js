@@ -19,7 +19,7 @@ async function getElection (req, res) {
     console.log("Election ==> ",Elections)
     res.status(200).json(Elections);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch Election' });
+    res.status(500).json({ error: error.message ||'Failed to fetch Election' });
   } finally {
     mongoose.connection.close();
   }
@@ -90,7 +90,7 @@ async function addElection (req, res) {
     res.status(200).json(Elections);
   } catch (error) {
     console.log(error)
-    res.status(500).json({ error: 'Failed to fetch Election' });
+    res.status(500).json({error: error.message|| 'Failed to fetch Election' });
   } finally {
     mongoose.connection.close();
   }
@@ -123,7 +123,7 @@ async function updateElection (req, res) {
     res.status(200).json({result : result});
   } catch (error) {
     console.log(error)
-    res.status(500).json({ error: 'Failed to fetch Election' });
+    res.status(500).json({ error:error.message|| 'Failed to fetch Election' });
   } finally {
     mongoose.connection.close();
   }
@@ -151,7 +151,7 @@ async function deleteElection (req, res) {
     res.status(200).json({result : {electionResult,voterResult,candidateResult}});
   } catch (error) {
     console.log(error)
-    res.status(500).json({ error: 'Failed to fetch Election' });
+    res.status(500).json({ error: error.message||'Failed to fetch Election' });
   } finally {
     mongoose.connection.close();
   }

@@ -62,5 +62,31 @@ function checkNotEmptyThrowError(value, errorMessage) {
     }
 }
 
+function checkIsEnd (election){
+    const endDate = new Date(election.election_end);
+    const now = new Date();
+    
+    const timeDiff = endDate.getTime() - now.getTime(); //เอาเวลาจบลบเวลาปัจจุบัน
 
-module.exports = {checkIfEmpty, checkIfStringIsZero, checkNotEmpty, checkNotEmptyThrowError};
+    if(timeDiff > 0){
+        return false //ยังไม่จบ
+    }else{
+        return true //จบแล้ว
+    }
+}
+
+function checkIsStart (election){
+    const startDate = new Date(election.election_start);
+    const now = new Date();
+    
+    const timeDiff = now.getTime() - startDate.getTime(); //เอาเวลาปัจจุบันลบเวลาเริ่ม
+
+    if(timeDiff > 0){
+        return true //เริ่มแล้ว
+    }else{
+        return false //ยังไม่เริ่ม
+    }
+}
+
+
+module.exports = {checkIfEmpty, checkIfStringIsZero, checkNotEmpty, checkNotEmptyThrowError , checkIsEnd, checkIsStart};

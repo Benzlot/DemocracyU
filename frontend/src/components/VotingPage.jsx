@@ -3,6 +3,7 @@ import { castVote } from '../services/votingService';
 import CandidateCard from './CandidateCard';
 import '../components-style/VotingPage.css';
 import { getCandidates } from '../services/candidateService';
+import { getElection } from '../services/electionService'; // Ensure this function is available
 import { getVoterByMail } from '../services/voterService';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
@@ -12,36 +13,66 @@ import Swal from 'sweetalert2';
 import DigitalClock from './DigitalClock';
 import ClipLoader from 'react-spinners/ClipLoader';
 
-
 const VotingPage = () => {
   const { account, userData, logout } = useContext(AuthContext);
-  const [votes, setVotes] = useState([]);// เก็บ Candidate
+  const [votes, setVotes] = useState([]); // Store Candidates
   const [electionName, setElectionName] = useState(userData.electionName);
   const [status, setStatus] = useState(userData.status);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate()
+  const [isButtonVisible, setIsButtonVisible] = useState(true);
+  const navigate = useNavigate();
 
   async function fetchCandidate() {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       let rawCandidate = await getCandidates(electionName);
       let mappedCandidate = mapCandidate(rawCandidate);
-      setVotes(mappedCandidate)
+      setVotes(mappedCandidate);
     } catch (error) {
-      //alert
       console.error("Failed to fetch candidate:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
+    }
+  }
+
+  async function checkElectionStatus() {
+    try {
+      const rawData = await getElection(); // Fetch election data
+      const elections = rawData.map((data) => ({
+        start: data.election_start,
+        end: data.election_end,
+      }));
+
+      if (elections.length > 0) {
+        const firstElection = elections[0];
+        const now = new Date();
+        if (now > firstElection.end) {
+          setIsButtonVisible(false);
+          Swal.fire({
+            title: 'Voting has ended',
+            text: 'You will be redirected to the results page.',
+            icon: 'info',
+            confirmButtonText: 'OK',
+          }).then(() => {
+            navigate('/results');
+          });
+        } else if (now < firstElection.start) {
+          setIsButtonVisible(true);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to check election status:", error);
     }
   }
 
   useEffect(() => {
-    console.log(electionName, status)
+    console.log(electionName, status);
     userData.status = status;
-    if (status == "0") {
+    checkElectionStatus();
+    if (status === "0") {
       fetchCandidate();
-    } else if (status == "1") {
-      navigate('/results')
+    } else if (status === "1") {
+      navigate('/results');
     }
   }, [status]);
 
@@ -56,40 +87,57 @@ const VotingPage = () => {
       }));
   };
 
-
   const handleVote = async (id) => {
-    // if (selectedCandidate) {
+    if (!isButtonVisible) {
+      Swal.fire({
+        title: 'Voting has ended',
+        text: 'You will be redirected to the results page.',
+        icon: 'info',
+        confirmButtonText: 'OK',
+      }).then(() => {
+        navigate('/results');
+      });
+      return;
+    }
+
     try {
       await castVote(electionName, id, account.name, account.username);
-      alert('Vote cast successfully!');
+      Swal.fire('Vote cast successfully!');
     } catch (error) {
-      //alert---
       console.error('Failed to cast vote:', error);
-      // alert('Failed to cast vote. Please try again.');
+      Swal.fire('Failed to cast vote. Please try again.');
     }
-    // } else {
-    //   alert('Please select a candidate before voting.');
-    // }
   };
 
   const handleOnSelect = async (vote) => {
+    if (!isButtonVisible) {
+      Swal.fire({
+        title: 'Voting has ended',
+        text: 'You will be redirected to the results page.',
+        icon: 'info',
+        confirmButtonText: 'OK',
+      }).then(() => {
+        navigate('/results');
+      });
+      return;
+    }
+
     const { value: email } = await Swal.fire({
-      title: vote.id == 0 ?"กรุณากรอกอีเมลสถาบันเพื่อยืนยันการเลือกไม่ประสงลงคะแนน" :`กรุณากรอกอีเมลสถาบันเพื่อยืนยันการเลือกคุณ ${vote.candidateName}`,
+      title: vote.id === 0 ? "กรุณากรอกอีเมลสถาบันเพื่อยืนยันการเลือกไม่ประสงลงคะแนน" : `กรุณากรอกอีเมลสถาบันเพื่อยืนยันการเลือกคุณ ${vote.candidateName}`,
       input: "email",
       inputLabel: `Your email address`,
       inputPlaceholder: account.username
     });
     if (email === account.username) {
       Swal.fire(`Entered email: ${email}`);
-      await handleVote(vote.id)
-      setStatus(1)
+      await handleVote(vote.id);
+      setStatus(1);
     } else {
       Swal.fire(`Email not match`);
     }
-  }
+  };
 
   if (isLoading) {
-    // Render spinner while loading
     return (
       <div style={{
         display: 'flex',
@@ -97,16 +145,10 @@ const VotingPage = () => {
         alignItems: 'center',
         height: '100vh'
       }}>
-        <ClipLoader
-          color="#ff0000"
-          cssOverride={{}}
-          size={100}
-          speedMultiplier={2}
-        />
+        <ClipLoader color="#ff0000" size={100} speedMultiplier={2} />
       </div>
     );
   }
-
 
   return (
     <div>
@@ -157,7 +199,9 @@ const VotingPage = () => {
         ))}
       </div>
 
-      <button onClick={() => handleOnSelect({id : 0})} className="submitButton">ไม่ประสงค์ลงคะแนน</button>
+      {isButtonVisible && (
+        <button onClick={() => handleOnSelect({ id: 0 })} className="submitButton">ไม่ประสงค์ลงคะแนน</button>
+      )}
     </div>
   );
 };

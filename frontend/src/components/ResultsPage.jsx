@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import 'chart.js/auto';
 import { useSpring, animated, useTransition } from 'react-spring';
@@ -8,46 +8,68 @@ import '../components-style/ResultsPage.css';
 import { getCandidates } from '../services/candidateService';
 import { getVotes } from '../services/votingService';
 import { getStatus } from '../services/voterService';
+import { getElection } from '../services/electionService'; // Ensure this function is available
 import ClipLoader from 'react-spinners/ClipLoader';
 import { AuthContext } from '../context/AuthContext';
 
 const ResultsPage = () => {
   const { account, userData, logout } = useContext(AuthContext);
   const [totalVotes, setTotalVotes] = useState('');
-  const [nonVotes, setNonVotes] = useState('') // Assume a total of 1000 eligible voters
-  const location = useLocation();
+  const [nonVotes, setNonVotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [candidateVotes, setCandidateVotes] = useState("");
+  const [isElectionEnded, setIsElectionEnded] = useState(false);
+  const [intervalId, setIntervalId] = useState(null); // State for interval ID
 
   const sortedCandidates = [...candidateVotes].sort((a, b) => b.votes - a.votes);
 
   async function fetchCandidate() {
-  try{
-      setIsLoading(true)
+    setIsLoading(true);
+    try {
       const electionName = userData.electionName;
-      console.log(electionName)
+
+      // Fetch election data to check if the election has ended
+      const rawElectionData = await getElection();
+      const elections = rawElectionData.map((data) => ({
+        id: data.id,
+        name: data.election_name,
+        start: new Date(data.election_start),
+        end: new Date(data.election_end),
+      }));
+
+      if (elections.length > 0) {
+        const firstElection = elections[0];
+        const now = new Date();
+        setIsElectionEnded(now > firstElection.end);
+        
+        // If election has ended, clear the interval
+        if (now > firstElection.end && intervalId) {
+          clearInterval(intervalId);
+        }
+      }
+
+      // Fetch candidates and votes
       let rawCandidate = await getCandidates(electionName);
       let mappedCandidate = mapCandidate(rawCandidate);
-      console.log("mappedCandidate", mappedCandidate)
       let rawVoting = await getVotes(electionName);
-      console.log("rawVoting", rawVoting)
-      let candidateVoteMapped = mergeCounts(mappedCandidate, rawVoting)
-      console.log("candidateVoteMapped", candidateVoteMapped)
-      setCandidateVotes(candidateVoteMapped)
+      let candidateVoteMapped = mergeCounts(mappedCandidate, rawVoting);
+      setCandidateVotes(candidateVoteMapped);
+
+      // Fetch vote status
       let { vote, nonVote } = await getStatus(electionName);
-      setNonVotes(nonVote)
-      setTotalVotes(vote)
-      setIsLoading(false)
-    }catch(error){
-      //alert 
-      console.log(error)
+      setNonVotes(nonVote);
+      setTotalVotes(vote);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   const mapCandidate = (rawData) => {
     return rawData.map((data) => ({
-      id: data.id, // Assuming id is unique and can be used as key
-      imageSrc: `/uploads/${data.img?.path}` || 'https://i.imghippo.com/files/YeJ7o1721571932.png', // Example placeholder URL
+      id: data.id,
+      imageSrc: `/uploads/${data.img?.path}` || 'https://i.imghippo.com/files/YeJ7o1721571932.png',
       name: data.name || 'Candidate Name',
     }));
   };
@@ -60,19 +82,24 @@ const ResultsPage = () => {
 
     return candidate.map(item => ({
       ...item,
-      votes: countMap[item.id] || 0 // Add count or default to 0 if no match
+      votes: countMap[item.id] || 0
     }));
   }
 
   useEffect(() => {
     fetchCandidate();
+    
+    // Set interval to fetch every minute if the election hasn't ended
+    if (!isElectionEnded) {
+      const id = setInterval(fetchCandidate, 60000);
+      setIntervalId(id);
+    }
 
-    // Set interval to fetch every minute
-    const intervalId = setInterval(fetchCandidate, 60000);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(intervalId);
-  }, []);
+    // Cleanup interval on component unmount or election end
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isElectionEnded]);
 
   const data = {
     datasets: [
@@ -98,7 +125,6 @@ const ResultsPage = () => {
     },
   };
 
-  // Generate gradient colors from dark red to gray
   const colors = chroma.scale(['#A12B20', '#D3D3D3']).colors(candidateVotes.length);
 
   const transitions = useTransition(
@@ -113,7 +139,6 @@ const ResultsPage = () => {
   );
 
   if (isLoading) {
-    // Render spinner while loading
     return (
       <div style={{
         display: 'flex',
@@ -140,7 +165,11 @@ const ResultsPage = () => {
             srcSet="https://cdn.builder.io/api/v1/image/assets/TEMP/4123dc5fcfaad26a9e5a99ac9310e751550c6b04072cde979964dd3ea16ab3cc?apiKey=1f6df3b559f94f9cadab107301ebb8cc&width=100 100w, https://cdn.builder.io/api/v1/image/assets/TEMP/4123dc5fcfaad26a9e5a99ac9310e751550c6b04072cde979964dd3ea16ab3cc?apiKey=1f6df3b559f94f9cadab107301ebb8cc&width=200 200w, https://cdn.builder.io/api/v1/image/assets/TEMP/4123dc5fcfaad26a9e5a99ac9310e751550c6b04072cde979964dd3ea16ab3cc?apiKey=1f6df3b559f94f9cadab107301ebb8cc&width=400 400w, https://cdn.builder.io/api/v1/image/assets/TEMP/4123dc5fcfaad26a9e5a99ac9310e751550c6b04072cde979964dd3ea16ab3cc?apiKey=1f6df3b559f94f9cadab107301ebb8cc&width=800 800w, https://cdn.builder.io/api/v1/image/assets/TEMP/4123dc5fcfaad26a9e5a99ac9310e751550c6b04072cde979964dd3ea16ab3cc?apiKey=1f6df3b559f94f9cadab107301ebb8cc&width=1200 1200w, https://cdn.builder.io/api/v1/image/assets/TEMP/4123dc5fcfaad26a9e5a99ac9310e751550c6b04072cde979964dd3ea16ab3cc?apiKey=1f6df3b559f94f9cadab107301ebb8cc&width=1600 1600w, https://cdn.builder.io/api/v1/image/assets/TEMP/4123dc5fcfaad26a9e5a99ac9310e751550c6b04072cde979964dd3ea16ab3cc?apiKey=1f6df3b559f94f9cadab107301ebb8cc&width=2000 2000w, https://cdn.builder.io/api/v1/image/assets/TEMP/4123dc5fcfaad26a9e5a99ac9310e751550c6b04072cde979964dd3ea16ab3cc?apiKey=1f6df3b559f94f9cadab107301ebb8cc&"
           />
         </div>
-        <div><h1>ผลคะแนนการเลือกตั้งอย่างไม่เป็นทางการ</h1></div>
+        <div>
+          <h1>
+            {isElectionEnded ? 'ผลคะแนนการเลือกตั้งอย่างเป็นทางการ' : 'ผลคะแนนการเลือกตั้งอย่างไม่เป็นทางการ'}
+          </h1>
+        </div>
       </div>
       <div className='eRe'>
         <div className="election-results">
@@ -159,11 +188,10 @@ const ResultsPage = () => {
               const color = colors[item.index];
               return (
                 <animated.div key={item.name} className="candidate" style={{ ...style, backgroundColor: color }}>
-                  <div className="candidate-rank">{item.index + 1}.</div>
-                  <div className="candidate-info">
-                    <div className="candidate-name">{item.name}</div>
-                    <div className="candidate-votes">{item.votes} คะแนน</div>
-                  </div>
+                  <div className="candidate-rank">{item.index + 1}</div>
+                  <img src={item.imageSrc} alt={item.name} />
+                  <div className="candidate-name">{item.name}</div>
+                  <div className="candidate-votes">{item.votes} คะแนน</div>
                 </animated.div>
               );
             })}

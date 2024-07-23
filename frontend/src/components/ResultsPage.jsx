@@ -19,7 +19,6 @@ const ResultsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [candidateVotes, setCandidateVotes] = useState("");
   const [isElectionEnded, setIsElectionEnded] = useState(false);
-  const [intervalId, setIntervalId] = useState(null); // State for interval ID
 
   const sortedCandidates = [...candidateVotes].sort((a, b) => b.votes - a.votes);
 
@@ -41,11 +40,6 @@ const ResultsPage = () => {
         const firstElection = elections[0];
         const now = new Date();
         setIsElectionEnded(now > firstElection.end);
-        
-        // If election has ended, clear the interval
-        if (now > firstElection.end && intervalId) {
-          clearInterval(intervalId);
-        }
       }
 
       // Fetch candidates and votes
@@ -88,18 +82,9 @@ const ResultsPage = () => {
 
   useEffect(() => {
     fetchCandidate();
-    
-    // Set interval to fetch every minute if the election hasn't ended
-    if (!isElectionEnded) {
-      const id = setInterval(fetchCandidate, 60000);
-      setIntervalId(id);
-    }
-
-    // Cleanup interval on component unmount or election end
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [isElectionEnded]);
+   const intervalId = setInterval(fetchCandidate, 60000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   const data = {
     datasets: [
@@ -191,7 +176,7 @@ const ResultsPage = () => {
                   <div className="candidate-rank">{item.index + 1}</div>
                   <img src={item.imageSrc} alt={item.name} />
                   <div className="candidate-name">{item.name}</div>
-                  <div className="candidate-votes">{item.votes} คะแนน</div>
+                  <div className="candidate-votes">{item.votes} votes</div>
                 </animated.div>
               );
             })}

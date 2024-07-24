@@ -39,7 +39,6 @@ const UserDashboard = () => {
 
   useEffect(() => {
     handleDateChange();
-    console.log("userData", userData);
   }, [userData]);
 
   if (isLoading) {

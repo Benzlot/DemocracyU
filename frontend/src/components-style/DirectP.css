@@ -1,48 +1,41 @@
-.Directory {
-  color: black;
-  font-size: 1.5vw;
-  text-align: center;
+.Directory{
+    color: black;
+    font-size: 1.5vw;
+   text-align: center;
 }
-
-.candidates-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust the min size and number of columns */
-  gap: 20px; /* Space between the cards */
-  margin-top: 20px;
-  padding: 0 5vw; /* Responsive padding */
-  justify-content: center; /* Center the grid items horizontally */
-  max-width: 1200px; /* Optional: limit the maximum width of the container */
-  margin-left: auto; /* Center container horizontally */
-  margin-right: auto; /* Center container horizontally */
-}
-
-.candidate-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 2rem;
-  background-color: #f9f9f9;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.candidate-image {
-  width: 100%; /* Adjust to fit container */
-  height: auto; /* Maintain aspect ratio */
-  max-width: 300px; /* Optional: limit maximum width */
-}
-
-.candidate-info {
-  margin-top: 1rem;
-}
-
-.candidate-name {
-  font-size: 1.5vw;
-  margin-bottom: 10px;
-}
-
-.candidate-votes {
-  font-size: 1vw;
-  color: #555;
-}
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .candidate-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-left: 3vw;
+    margin-right: 3vw;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    width: 20vw;
+    text-align: center;
+    background-color: #f9f9f9;
+  }
+  
+  .candidate-image {
+    width: 20vw;
+    height: 15vw;
+  }
+  
+  .candidate-name {
+    font-size: 1.5vw;
+    margin-bottom: 10px;
+  }
+  
+  .candidate-description {
+    font-size: 1vw;
+    color: #555;
+  }
+  

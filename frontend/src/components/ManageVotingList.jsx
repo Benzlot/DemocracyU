@@ -22,7 +22,7 @@ const ManageVotingList = () => {
         setIsLoading(true)
         try {
             const rawData = await getElection();
-            console.log(rawData);
+         
             if (Array.isArray(rawData)) {
                 const data = mapElection(rawData);
                 setElection(data);

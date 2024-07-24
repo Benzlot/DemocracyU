@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { PublicClientApplication, InteractionRequiredAuthError } from '@azure/msal-browser';
+import { PublicClientApplication } from '@azure/msal-browser';
 import { msalConfig, loginRequest, graphConfig } from '../config/msalConfig';
 import { checkAdmin } from '../services/authService';
 import { getVoterByMail } from '../services/voterService';
@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   const [account, setAccount] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isAdmin, setIsAdmin] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Added loading state
 
   useEffect(() => {
     const initializeMsalInstance = async () => {
@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         console.error(error);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // Set loading to false after initialization
       }
     };
     initializeMsalInstance();
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async () => {
     try {
-      setIsLoading(true);
+      setIsLoading(true); // Set loading to true during login
       await msalInstance.handleRedirectPromise();
       const loginResponse = await msalInstance.loginPopup(loginRequest);
       setAccount(loginResponse.account);
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Set loading to false after login
     }
   };
 
@@ -68,7 +68,6 @@ export const AuthProvider = ({ children }) => {
         ...loginRequest,
         account,
       });
-
       let userResponse = await axios.get(graphConfig.graphMeEndpoint, {
         headers: {
           Authorization: `Bearer ${tokenResponse.accessToken}`,
@@ -78,9 +77,10 @@ export const AuthProvider = ({ children }) => {
       const scanAdmin = await checkAdmin(userResponse.data.userPrincipalName);
       setIsAdmin(scanAdmin ? true : false);
 
-      let userData = await getVoterByMail(userResponse.data.userPrincipalName);
-      userResponse.data.electionName = userData.election_name;
-      userResponse.data.status = userData.status;
+      let userData = await getVoterByMail(userResponse.data.userPrincipalName)
+  
+      userResponse.data.electionName = userData.election_name
+      userResponse.data.status = userData.status
 
       const photoResponse = await axios.get(`${graphConfig.graphMeEndpoint}/photo/$value`, {
         headers: {
@@ -96,12 +96,7 @@ export const AuthProvider = ({ children }) => {
         photoUrl,
       });
     } catch (error) {
-      if (error instanceof InteractionRequiredAuthError) {
-        console.error('Interaction required:', error);
-        await login(); // Trigger interactive login
-      } else {
-        console.error(error);
-      }
+      console.error(error);
     }
   };
 

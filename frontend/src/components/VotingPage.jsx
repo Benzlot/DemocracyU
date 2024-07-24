@@ -66,7 +66,7 @@ const VotingPage = () => {
   }
 
   useEffect(() => {
-    console.log(electionName, status);
+  
     userData.status = status;
     checkElectionStatus();
     if (status === "0") {

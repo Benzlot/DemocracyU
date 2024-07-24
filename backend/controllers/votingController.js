@@ -35,7 +35,7 @@ async function getVoteResult(req, res) {
         { $sort: { count: -1 } },
       ]);
 
-      console.log(voteResults);
+   
       res.status(200).json(voteResults);
     }
   } catch (error) {
@@ -71,7 +71,7 @@ async function getRank(req, res) {
         { $sort: { count: -1 } },
       ]);
 
-      console.log(voteResults);
+  
       res.status(200).json(voteResults);
     } else {
       throw new Error("Election not end yet"); // edit error text
@@ -116,7 +116,7 @@ async function vote(req, res) {
       mail: mail,
       election_name: election_name,
     });
-    console.log(voters);
+  
     checkIfStringIsZero(voters.status, "Voter has been voted");
 
     const blockchain = new Blockchain();
@@ -157,7 +157,7 @@ class Blockchain {
         useUnifiedTopology: true,
         dbName: "DemocracyU",
       });
-      console.log("MongoDB Connected");
+  
 
       this.model = model;
       // Initialize blockchain operations

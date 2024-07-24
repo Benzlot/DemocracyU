@@ -29,11 +29,11 @@ const ManageDataCandidate = () => {
         setIsLoading(true)
         try {
             const rawData = await getElection();
-            console.log(rawData)
+          
             const allElection = rawData.map((election) => {
                 return election.election_name;
             })
-            console.log(allElection)
+    
             setElection(allElection);
         } catch (error) {
             //alert here
@@ -53,7 +53,7 @@ const ManageDataCandidate = () => {
             //add try catch here
             const electionName = election[electionType]
             await deleteCandidate(electionName, candidates[index].studentId)
-            console.log("delete pass")
+          
             const updatedCandidates = candidates.filter((_, i) => i !== index);
             setCandidates(updatedCandidates);
         } else {
@@ -111,17 +111,17 @@ const ManageDataCandidate = () => {
         if (electionType) {
             setLoading(true);
             const formData = new FormData();
-            console.log(file)
+        
             const candidateList = createCandidate();
             let candidateString = JSON.stringify(candidateList)
-            console.log(candidateString)
+       
             const electionName = election[electionType];
             formData.append('election_name', electionName);
             formData.append('candidate_list', candidateString);
             for (let i = 0; i < file.length; i++) {
                 formData.append('image', file[i]);
             }
-            console.log(formData)
+    
             await addCandidate(formData);
             Swal.fire({
                 position: "center",
@@ -143,7 +143,7 @@ const ManageDataCandidate = () => {
         if (electionType) {
             const electionName = election[electionType];
             const candidatesList = await getCandidates(electionName);
-            // console.log(candidatesList[0].img.path)
+    
             const candidateListMapped = candidatesList
                 .filter(candidate => candidate.student_id !== "00" )
                 .map(candidate => ({

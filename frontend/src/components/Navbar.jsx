@@ -12,7 +12,7 @@ const Navbar = () => {
   async function fetchVoterData() {
     setIsLoading(true)
     try {
-      // console.log(account)
+
       let rawVoter = await getVoterByMail(account.username);
       //handel error here
       setIsLoading(true)

@@ -33,7 +33,7 @@ const EditVoting = () => {
             setElectionType(rawData.election_type);
             setStartDate(rawData.election_start);
             setEndDate(rawData.election_end);
-            console.log(rawData);
+           
         } catch (error) {
             //alert
             console.error("Failed to fetch election:", error);
@@ -44,7 +44,7 @@ const EditVoting = () => {
 
     useEffect(() => {
         fetchElection(state);
-        console.log(state);
+     
     }, [state]);
 
     const handleStartDateChange = (e) => {

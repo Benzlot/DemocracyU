@@ -7,7 +7,6 @@ export const getCandidates = async (election_name) => {
     const response = await axios.post(`${API_URL}/`,{
       election_name : election_name
     });
-    console.log(response.data)
     return response.data;
   } catch (error) {
     console.error('Error fetching candidates:', error);

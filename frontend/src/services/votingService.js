@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://democracyu.onrender.com/api/vote';
+const API_URL = 'https://democracyu.onrender.com/api/vote';
 
 export const getVotes = async (election_name) => {
   const response = await axios.post(`${API_URL}/get`,{

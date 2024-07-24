@@ -15,7 +15,7 @@ async function checkAdmin (req, res) {
       
     let admin = await Admin.findOne({ mail: mail }).lean().exec();
 
-
+    // console.log("found :", admin)
 
     res.status(200).json(admin);
   } catch (error) {

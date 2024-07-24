@@ -16,7 +16,7 @@ async function getElection (req, res) {
       
     let Elections = await Election.find();
 
-   
+    console.log("Election ==> ",Elections)
     res.status(200).json(Elections);
   } catch (error) {
     res.status(500).json({ error: error.message ||'Failed to fetch Election' });
@@ -39,7 +39,7 @@ async function getElectionbyName (req, res) {
     let Elections = await Election.findOne({election_name : election_name});
     checkIfEmpty(Elections, "Election not found")
 
-   
+    console.log("Election ==> ",Elections)
     res.status(200).json(Elections);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch Election' });
@@ -98,7 +98,7 @@ async function addElection (req, res) {
 }
 
 async function updateElection (req, res) {
-
+  console.log(req.body);
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
@@ -174,7 +174,7 @@ const scheduleElectionEndCheck = (election) => {
 };
 
 const triggerElectionEndFunction = (election) => {
- 
+  console.log(`Election ${election.election_name} has ended. Triggering end function.`);
   // Add your desired functionality here
   // Example: update election status, notify users, etc.
 };

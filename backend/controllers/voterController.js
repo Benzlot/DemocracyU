@@ -20,7 +20,7 @@ async function getVoter (req, res) {
 
     let voters = await Voter.find({election_name : election_name})
     
-    
+    console.log("voters ==> ",voters)
     res.status(200).json(voters);
   } catch (error) {
     console.log(error)
@@ -50,7 +50,7 @@ async function getVoterStatus (req,res){
             count: { $sum: 1 } // Count the number of documents for each status
           }},
         {$sort: { _id: 1 }}])
-  
+      console.log("voters ==> ",voters)
       res.status(200).json(transformCounts(voters));
   } catch (error) {
       console.log(error)
@@ -159,7 +159,7 @@ async function getVoterByMail (req, res){
       
     // let Elections = await Election.findOne({election_name : election_name});
     const voter = await Voter.findOne({ mail : mail})
-    
+    console.log("Voter",voter)
     checkIfEmpty(voter, "voter not found")
 
 

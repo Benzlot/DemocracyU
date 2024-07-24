@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/admins';
+const API_URL = 'https://democracyu.onrender.com/api/admins';
 
 
 export const checkAdmin = async (mail) => {

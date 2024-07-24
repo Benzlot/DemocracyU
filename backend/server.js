@@ -25,7 +25,7 @@ app.use('/api/vote', votingRoutes);
 app.use('/api/elections',electionRoutes)
 app.use('/api/voters', votersRoutes)
 app.use('/', (req, res)=>{
-  console.log(req);
+  console.log(req.body);
   res.send('Not found');
 })
 app.listen(PORT, () => {

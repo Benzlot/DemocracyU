@@ -1,55 +1,83 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { Link } from 'react-router-dom'; // Assuming you're using react-router-dom
+import { Link } from 'react-router-dom';
+import { getElectionbyName } from '../services/electionService'; // Ensure this function is available
 import { getElection } from '../services/electionService';
 import ClipLoader from 'react-spinners/ClipLoader';
-
+import { getVoterByMail } from '../services/voterService';
+import Swal from 'sweetalert2';
 
 const UserDashboard = () => {
-  const { account, userData, logout } = useContext(AuthContext);
+  const { account, userData } = useContext(AuthContext);
+  const [electionName, setElectionName] = useState(userData.electionName);
   const [isButtonVisible, setIsButtonVisible] = useState(true); // State for button visibility
   const [isLoading, setIsLoading] = useState(false);
+
+  async function checkStatusMail(mail) {
+    try {
+      let rawData = await getVoterByMail(mail);
+      if (!rawData) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'คุณไม่มีสิทธิ์เข้าถึงการเลือกตั้งนี้',
+          confirmButtonText: 'OK',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Clear login data
+            // For cookies, you can use a library like js-cookie
+            // Cookies.remove('your-cookie-name');
+
+            // For localStorage
+            localStorage.clear();
+
+            // Navigate to login page
+            window.location.reload();
+          }
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   async function handleDateChange() {
     setIsLoading(true);
     try {
-      const rawData = await getElection(); // Await the result of getElection
-      const elections = rawData.map((data) => ({
-        start: new Date(data.election_start),
-        end: new Date(data.election_end),
-      }));
-
-      if (elections.length > 0) {
-        const firstElection = elections[elections.length - 1];
-        const now = new Date();
-
-        if (now < firstElection.start || now > firstElection.end) {
-          setIsButtonVisible(false); // Hide button if not within the date range
-        } else {
-          setIsButtonVisible(true); // Show button if within the date range
-        }
+      const elections = await getElectionbyName(electionName); // Fetch election data
+      const now = new Date();
+      const electionStart = new Date(elections.election_start);
+      const electionEnd = new Date(elections.election_end);
+      if (now < electionStart || now > electionEnd) {
+        setIsButtonVisible(false); // Hide button if not within the date range
+      } else {
+        setIsButtonVisible(true); // Show button if within the date range
       }
     } catch (error) {
-      console.error("Failed to handle date change:", error);
+      console.error('Failed to handle date change:', error);
     } finally {
       setIsLoading(false);
     }
   }
 
-
   useEffect(() => {
+    if (account?.username) {
+      checkStatusMail(account.username);
+    }
     handleDateChange();
-  }, [userData]);
+  }, [account?.name, userData]); // Added account?.name to dependencies
 
   if (isLoading) {
     // Render spinner while loading
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
         <ClipLoader
           color="#ff0000"
           cssOverride={{}}
@@ -59,7 +87,6 @@ const UserDashboard = () => {
       </div>
     );
   }
-
 
   return (
     <div className="dashboard-container">

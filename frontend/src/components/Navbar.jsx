@@ -10,23 +10,19 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   async function fetchVoterData() {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-
       let rawVoter = await getVoterByMail(account.username);
-      //handel error here
-      setIsLoading(true)
-      setElectionName(rawVoter.election_name)
-      setStatus(rawVoter.status)
-
+      setIsLoading(true);
+      setElectionName(rawVoter.election_name);
+      setStatus(rawVoter.status);
     } catch (error) {
-      //alert ---
-      console.error("Failed to fetch voter data:", error);
+      console.error('Failed to fetch voter data:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
-  
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -40,7 +36,9 @@ const Navbar = () => {
       <div className="navbar">
         <div className="navbar-left">
           <div className="DemocracyU">
-            <Link to="/" className="Title">DemocracyU</Link>
+            <Link to="/" className="Title">
+              DemocracyU
+            </Link>
           </div>
         </div>
         <div className="navbar-right">
@@ -48,21 +46,25 @@ const Navbar = () => {
             <>
               <div className="username">{account.name}</div>
               {userData && userData.photoUrl ? (
-                <img 
-                  src={userData.photoUrl} 
-                  alt={`${account.name}'s profile`} 
-                  className="profile-pic" 
+                <img
+                  src={userData.photoUrl}
+                  alt={`${account.name}'s profile`}
+                  className="profile-pic"
                   onClick={toggleDropdown}
                 />
               ) : (
                 <div>No Profile Picture</div>
               )}
               <div className={`dropdown-menu ${isDropdownOpen ? 'open' : ''}`}>
-                <button onClick={logout} className="logout-button">Logout</button>
+                <button onClick={logout} className="logout-button">
+                  Logout
+                </button>
               </div>
             </>
           ) : (
-            <Link to="/login" className="login">Login</Link>
+            <Link to="/login" className="login">
+              Login
+            </Link>
           )}
         </div>
         <div className="hamburger" onClick={toggleMenu}>
@@ -73,9 +75,15 @@ const Navbar = () => {
       </div>
       {account && (
         <div className={`dashboard-navbar ${isMenuOpen ? 'open' : ''}`}>
-          <Link to="/directory" className="nav-link" onClick={toggleMenu}>ทำเนียบนักศึกษา</Link>
-          <Link to="/results" className="nav-link" >ผลการเลือกตั้ง</Link>
-          <Link to="/evaluationPage" className="nav-link" onClick={toggleMenu}>ประเมินเว็ปไซต์</Link>
+          <Link to="/directory" className="nav-link" onClick={toggleMenu}>
+            ทำเนียบนักศึกษา
+          </Link>
+          <Link to="/results" className="nav-link">
+            ผลการเลือกตั้ง
+          </Link>
+          <Link to="/evaluationPage" className="nav-link" onClick={toggleMenu}>
+            ประเมินเว็ปไซต์
+          </Link>
         </div>
       )}
     </div>

@@ -1,4 +1,3 @@
-// components/DirectoryPage.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import { getCandidates } from '../services/candidateService';
 import { getVotes } from '../services/votingService';
@@ -42,7 +41,9 @@ const DirectoryPage = () => {
       return acc;
     }, {});
 
-    return candidates.map(candidate => ({
+    return candidates
+    .filter(candidate => candidate.student_id !== "00" )
+    .map(candidate => ({
       ...candidate,
       votes: countMap[candidate.id] || 0,
     }));
@@ -53,6 +54,8 @@ const DirectoryPage = () => {
       .sort((a, b) => b.votes - a.votes)
       .slice(0, 3);
   }
+
+  const titles = ['ประธาน', 'รองประธาน', 'เลขานุการ'];
 
   if (isLoading) {
     return (
@@ -76,18 +79,17 @@ const DirectoryPage = () => {
     <div className="directory-page">
       <div className='DirectTitle'><h1>ทำเนียบนักศึกษา</h1></div>
       {topCandidates.length > 0 ? (
-        <div className="candidates-container">
+        <div className="rank-container">
           {topCandidates.map((candidate, index) => (
             <div key={candidate.id} className="candidate-card">
               <img
-                src={candidate.imageSrc || '/fallback.png'} // Use local fallback image
+                src={candidate.img?.path || '/fallback.png'} // Use local fallback image
                 alt={candidate.name}
                 className="candidate-image"
               />
               <div className="candidate-info">
-                <div className="candidate-rank">{index + 1}</div>
+                <div className="candidate-rank">{titles[index]}</div>
                 <div className="candidate-name">{candidate.name}</div>
-                <div className="candidate-votes">{candidate.votes} votes</div>
               </div>
             </div>
           ))}

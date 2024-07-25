@@ -1,6 +1,6 @@
 import React from 'react';
 import '../components-style/EvaP.css';
-import qrCodeImage from '../image/qr-code.png'; // นำเข้ารูปภาพจากที่อยู่ที่เตรียมไว้
+import qrCodeImage from '../image/qr-code.png';
 
 const EvaluationPage = () => {
   return (

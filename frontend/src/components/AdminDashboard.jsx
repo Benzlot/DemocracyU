@@ -29,7 +29,9 @@ const AdminDashboard = () => {
       <div className="navbar">
         <div className="navbar-left">
           <div className="DemocracyU">
-            <Link to="/admin" className="Title">DemocracyU</Link>
+            <Link to="/admin" className="Title">
+              DemocracyU
+            </Link>
           </div>
         </div>
         <div className="navbar-right">
@@ -37,21 +39,25 @@ const AdminDashboard = () => {
             <>
               <div className="username">{account.name}</div>
               {userData && userData.photoUrl ? (
-                <img 
-                  src={userData.photoUrl} 
-                  alt={`${account.name}'s profile`} 
-                  className="profile-pic" 
+                <img
+                  src={userData.photoUrl}
+                  alt={`${account.name}'s profile`}
+                  className="profile-pic"
                   onClick={toggleDropdown}
                 />
               ) : (
                 <div>No Profile Picture</div>
               )}
               <div className={`dropdown-menu ${isDropdownOpen ? 'open' : ''}`}>
-                <button onClick={logout} className="logout-button">Logout</button>
+                <button onClick={logout} className="logout-button">
+                  Logout
+                </button>
               </div>
             </>
           ) : (
-            <Link to="/login" className="login">Login</Link>
+            <Link to="/login" className="login">
+              Login
+            </Link>
           )}
         </div>
       </div>
@@ -59,20 +65,46 @@ const AdminDashboard = () => {
         <DigitalClock />
       </div>
       <div className="function-buttons">
-        <a className="function-button" onClick={() => handleNavigate('/manage-voting-list')}>
-          <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/2ce82bc26ade1c739d9d608ab8b11d9e964f32f41dc2f611f3636da9d9abc742?apiKey=1f6df3b559f94f9cadab107301ebb8cc" alt="Election Management" />
+        <a
+          className="function-button"
+          onClick={() => handleNavigate('/manage-voting-list')}
+        >
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/TEMP/2ce82bc26ade1c739d9d608ab8b11d9e964f32f41dc2f611f3636da9d9abc742?apiKey=1f6df3b559f94f9cadab107301ebb8cc"
+            alt="Election Management"
+          />
           จัดการการเลือกตั้ง
         </a>
-        <a className="function-button" onClick={() => handleNavigate('/manage-student')}>
-          <img src="https://krishplayschool.com/images/icons/graduation.svg" alt="Student Management" />
+        <a
+          className="function-button"
+          onClick={() => handleNavigate('/manage-student')}
+        >
+          <img
+            src="https://krishplayschool.com/images/icons/graduation.svg"
+            alt="Student Management"
+          />
           จัดการข้อมูลนักศึกษา
         </a>
-        <a className="function-button" onClick={() => handleNavigate('/manage-candidate')}>
-          <img src="https://cdn-icons-png.freepik.com/512/2393/2393401.png" alt="Candidate Management" />
+        <a
+          className="function-button"
+          onClick={() => handleNavigate('/manage-candidate')}
+        >
+          <img
+            src="https://cdn-icons-png.freepik.com/512/2393/2393401.png"
+            alt="Candidate Management"
+          />
           จัดการข้อมูลผู้ลงสมัคร
         </a>
-        <a className="function-button" href='https://docs.google.com/forms/d/10xfy6m5XSpQlbt1pl3Bwi30ag_GByH570sgOBpmKAdo/edit' target='_blank' rel='noopener noreferrer'>
-          <img src="https://www.forest.go.th/checkpoint/wp-content/uploads/sites/30/2024/05/10897892.png" alt="Position Evaluation" />
+        <a
+          className="function-button"
+          href="https://docs.google.com/forms/d/10xfy6m5XSpQlbt1pl3Bwi30ag_GByH570sgOBpmKAdo/edit"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            src="https://www.forest.go.th/checkpoint/wp-content/uploads/sites/30/2024/05/10897892.png"
+            alt="Position Evaluation"
+          />
           แบบประเมินเว็ปไซต์
         </a>
       </div>

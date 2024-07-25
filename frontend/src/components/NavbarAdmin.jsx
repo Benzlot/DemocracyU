@@ -22,7 +22,9 @@ const NavbarAdmin = () => {
       <div className="navbar">
         <div className="navbar-left">
           <div className="DemocracyU">
-            <Link to="/admin" className="Title">DemocracyU</Link>
+            <Link to="/admin" className="Title">
+              DemocracyU
+            </Link>
           </div>
         </div>
         <div className="navbar-right">
@@ -30,21 +32,25 @@ const NavbarAdmin = () => {
             <>
               <div className="username">{account.name}</div>
               {userData && userData.photoUrl ? (
-                <img 
-                  src={userData.photoUrl} 
-                  alt={`${account.name}'s profile`} 
-                  className="profile-pic" 
+                <img
+                  src={userData.photoUrl}
+                  alt={`${account.name}'s profile`}
+                  className="profile-pic"
                   onClick={toggleDropdown}
                 />
               ) : (
                 <div>No Profile Picture</div>
               )}
               <div className={`dropdown-menu ${isDropdownOpen ? 'open' : ''}`}>
-                <button onClick={logout} className="logout-button">Logout</button>
+                <button onClick={logout} className="logout-button">
+                  Logout
+                </button>
               </div>
             </>
           ) : (
-            <Link to="/login" className="login">Login</Link>
+            <Link to="/login" className="login">
+              Login
+            </Link>
           )}
         </div>
         <div className="hamburger" onClick={toggleMenu}>
@@ -55,10 +61,21 @@ const NavbarAdmin = () => {
       </div>
       {account && (
         <div className={`dashboard-navbar ${isMenuOpen ? 'open' : ''}`}>
-          <Link to="/manage-voting-list" className="nav-link2">จัดการการเลือกตั้ง</Link>
-          <Link to="/manage-student" className="nav-link2">จัดการข้อมูลนักศึกษา</Link>
-          <Link to="/manage-candidate" className="nav-link2">จัดการข้อมูลผู้ลงสมัคร</Link>
-          <a href="https://docs.google.com/forms/d/10xfy6m5XSpQlbt1pl3Bwi30ag_GByH570sgOBpmKAdo/edit" className="nav-link2" target="_blank" rel="noopener noreferrer">
+          <Link to="/manage-voting-list" className="nav-link2">
+            จัดการการเลือกตั้ง
+          </Link>
+          <Link to="/manage-student" className="nav-link2">
+            จัดการข้อมูลนักศึกษา
+          </Link>
+          <Link to="/manage-candidate" className="nav-link2">
+            จัดการข้อมูลผู้ลงสมัคร
+          </Link>
+          <a
+            href="https://docs.google.com/forms/d/10xfy6m5XSpQlbt1pl3Bwi30ag_GByH570sgOBpmKAdo/edit"
+            className="nav-link2"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             แบบประเมินเว็ปไซต์
           </a>
         </div>

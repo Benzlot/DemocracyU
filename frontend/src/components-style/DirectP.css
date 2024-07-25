@@ -4,7 +4,7 @@
   text-align: center;
 }
 
-.candidates-container {
+.rank-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust the min size and number of columns */
   gap: 20px; /* Space between the cards */
@@ -38,11 +38,23 @@
 }
 
 .candidate-name {
-  font-size: 1.5vw;
+  font-size: 20px;
   margin-bottom: 10px;
 }
 
 .candidate-votes {
   font-size: 1vw;
   color: #555;
+}
+@media (max-width:467px) {
+  .candidate-card{
+    padding-bottom: 5px;
+    padding-left: 1px;
+    padding-right: 1px;
+    margin-left: 3rem;
+    margin-right: 3rem;
+  }
+  .candidate-image{
+    width: 50%;
+  }
 }

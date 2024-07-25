@@ -3,7 +3,7 @@ import { castVote } from '../services/votingService';
 import CandidateCard from './CandidateCard';
 import '../components-style/VotingPage.css';
 import { getCandidates } from '../services/candidateService';
-import { getElection } from '../services/electionService'; // Ensure this function is available
+import { getElectionbyName } from '../services/electionService'; // Ensure this function is available
 import { getVoterByMail } from '../services/voterService';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
@@ -37,16 +37,13 @@ const VotingPage = () => {
 
   async function checkElectionStatus() {
     try {
-      const rawData = await getElection(); // Fetch election data
+      const rawData = await getElectionbyName(electionName); // Fetch election data
       const elections = rawData.map((data) => ({
         start: data.election_start,
         end: data.election_end,
       }));
-
-      if (elections.length > 0) {
-        const firstElection = elections[0];
         const now = new Date();
-        if (now > firstElection.end) {
+        if (now > elections.end) {
           setIsButtonVisible(false);
           Swal.fire({
             title: 'Voting has ended',
@@ -56,10 +53,9 @@ const VotingPage = () => {
           }).then(() => {
             navigate('/results');
           });
-        } else if (now < firstElection.start) {
+        } else if (now < elections.start) {
           setIsButtonVisible(true);
         }
-      }
     } catch (error) {
       console.error("Failed to check election status:", error);
     }

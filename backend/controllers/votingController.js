@@ -18,7 +18,6 @@ async function getVoteResult(req, res) {
     console.log("req.body",req.body)
 
     await mongoose.connect(process.env.MONGODB_URI, {
-     
       dbName: "DemocracyU",
     });
 
@@ -56,7 +55,6 @@ async function getRank(req, res) {
     console.log("req.body",req.body)
 
     await mongoose.connect(process.env.MONGODB_URI, {
-     
       dbName: "DemocracyU",
     });
 
@@ -95,7 +93,6 @@ async function vote(req, res) {
     const { election_name, candidate_Id, name, mail } = req.body;
     console.log("req.body",req.body)
     await mongoose.connect(process.env.MONGODB_URI, {
-      
       dbName: "DemocracyU",
     });
 
@@ -157,7 +154,6 @@ class Blockchain {
       mongoose.connection.close();
 
       await mongoose.connect(process.env.MONGODB_URI, {
-      
         dbName: "DemocracyU",
       });
       console.log("MongoDB Connected");

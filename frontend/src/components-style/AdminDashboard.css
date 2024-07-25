@@ -1,8 +1,8 @@
 .function-buttons {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     justify-items: center;
+    grid-template-columns: repeat(2, 1fr);
     margin-top: 50px;
 }
 
@@ -11,7 +11,7 @@
     color: white;
     border: none;
     padding: 20px;
-    font-size: 18px;
+    font-size: 25px;
     border-radius: 10px;
     cursor: pointer;
     width: 250px;
@@ -20,6 +20,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    text-decoration: none;
 }
 
 .function-button img {
@@ -30,4 +31,28 @@
 
 .function-button:hover {
     background-color: #C12F2F;
+}
+
+@media (max-width: 768px) {
+    .function-buttons {
+        display: grid;
+        gap: 20px;
+        justify-items: center;
+        grid-template-columns: repeat(1, 1fr);
+        margin-top: 50px;
+    }
+    .function-button {
+        background-color: #A10F0F;
+        background-color: #a10f0f;
+        color: #fff;
+        border: none;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
 }

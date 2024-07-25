@@ -20,7 +20,7 @@ const UserDashboard = () => {
       }));
 
       if (elections.length > 0) {
-        const firstElection = elections[0];
+        const firstElection = elections[elections.length - 1];
         const now = new Date();
 
         if (now < firstElection.start || now > firstElection.end) {

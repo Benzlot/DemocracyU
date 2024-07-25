@@ -10,7 +10,6 @@ async function getElection (req, res) {
   try {
     console.log("run getElection")
     await mongoose.connect(process.env.MONGODB_URI, {
-  
       dbName: 'DemocracyU',
     });
       
@@ -33,7 +32,6 @@ async function getElectionbyName (req, res) {
     let {election_name} = req.body
     console.log("req.body",req.body)
     await mongoose.connect(process.env.MONGODB_URI, {
-   
       dbName: 'DemocracyU',
     });
       

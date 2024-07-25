@@ -10,7 +10,6 @@ async function getCandidates(req, res) {
     const { election_name } = req.body;
     console.log("req.body",req.body)
     await mongoose.connect(process.env.MONGODB_URI, {
-      
       dbName: "DemocracyU",
     });
 
@@ -22,9 +21,7 @@ async function getCandidates(req, res) {
     res.status(200).json(candidates);
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .json({ error: error.message || "Failed to fetch candidates" });
+    res.status(500).json({ error: error.message || "Failed to fetch candidates" });
   } finally {
     mongoose.connection.close();
     console.log("end getCandidates")
@@ -37,7 +34,6 @@ async function deleteCandidatebyID(req, res) {
     let { election_name, student_id } = req.body;
     console.log("req.body",req.body)
     await mongoose.connect(process.env.MONGODB_URI, {
-  
       dbName: "DemocracyU",
     });
 
@@ -60,7 +56,6 @@ async function addCandidate(req, res) {
   try {
     console.log("run addCandidate")
     await mongoose.connect(process.env.MONGODB_URI, {
-   
       dbName: "DemocracyU",
     });
     

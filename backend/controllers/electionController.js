@@ -8,9 +8,9 @@ const { checkNotEmptyThrowError ,checkIfEmpty } = require('../Service/commonServ
 
 async function getElection (req, res) {
   try {
+    console.log("run getElection")
     await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+  
       dbName: 'DemocracyU',
     });
       
@@ -19,20 +19,21 @@ async function getElection (req, res) {
     console.log("Election ==> ",Elections)
     res.status(200).json(Elections);
   } catch (error) {
+    console.error(error)
     res.status(500).json({ error: error.message ||'Failed to fetch Election' });
   } finally {
     mongoose.connection.close();
+    console.log("end getElection")
   }
 };
 
 async function getElectionbyName (req, res) {
   try {
-
+    console.log("run getElectionbyName")
     let {election_name} = req.body
-
+    console.log("req.body",req.body)
     await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+   
       dbName: 'DemocracyU',
     });
       
@@ -42,22 +43,24 @@ async function getElectionbyName (req, res) {
     console.log("Election ==> ",Elections)
     res.status(200).json(Elections);
   } catch (error) {
+    console.error("error",error)
     res.status(500).json({ error: 'Failed to fetch Election' });
   } finally {
     mongoose.connection.close();
+    console.log("end getElectionbyName")
   }
 };
 
 async function addElection (req, res) {
   try {
+    console.log("run addElection")
     await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+    
       dbName: 'DemocracyU',
     });
 
     let {election_name,election_type,start_date,end_date} = req.body
-
+    console.log("req.body",req.body)
     let election = await Election.findOne({election_name : election_name})
     checkNotEmptyThrowError(election, "Election name has been used")
 
@@ -67,11 +70,7 @@ async function addElection (req, res) {
       election_start: start_date,
       election_end: end_date,
     });
-
-    await addedElection.save()
-
-    scheduleElectionEndCheck(addedElection)
-
+    
     let addedCandidate = new Candidate({
       id: 0,
       name: "ไม่ประสงค์ลงคะแนน",
@@ -81,7 +80,9 @@ async function addElection (req, res) {
       vision: "00",
       election_name :election_name,
     })
+    
 
+    await addedElection.save()
     await addedCandidate.save()
 
 
@@ -93,21 +94,20 @@ async function addElection (req, res) {
     res.status(500).json({error: error.message|| 'Failed to fetch Election' });
   } finally {
     mongoose.connection.close();
+    console.log("end addElection")
   }
 
 }
 
 async function updateElection (req, res) {
-  console.log(req.body);
   try {
+    console.log("run updateElection")
     await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       dbName: 'DemocracyU',
     });
 
     let {election_name,election_type,start_date,end_date} = req.body
-
+    console.log("req.body",req.body);
     let election = await Election.findOne({election_name : election_name})
     checkIfEmpty(election, "Election not found")
 
@@ -119,26 +119,27 @@ async function updateElection (req, res) {
         election_end: end_date,
       } }
     )
-    
+    console.log("result",result);
     res.status(200).json({result : result});
   } catch (error) {
     console.log(error)
     res.status(500).json({ error:error.message|| 'Failed to fetch Election' });
   } finally {
     mongoose.connection.close();
+    console.log("end updateElection")
   }
 
 }
 
 async function deleteElection (req, res) {
   try {
+    console.log("run deleteElection")
     await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       dbName: 'DemocracyU',
     });
 
     let {election_name} = req.body
+    console.log("req.body",req.body);
 
     let election = await Election.findOne({election_name : election_name})
     checkIfEmpty(election, "Election not found")
@@ -147,37 +148,18 @@ async function deleteElection (req, res) {
     let voterResult = await Voter.deleteMany({ election_name : election_name})
     let candidateResult = await Candidate.deleteMany({ election_name : election_name})
     //add delete on voter and candidate
-    
+    console.log("result", {electionResult,voterResult,candidateResult})
     res.status(200).json({result : {electionResult,voterResult,candidateResult}});
   } catch (error) {
     console.log(error)
     res.status(500).json({ error: error.message||'Failed to fetch Election' });
   } finally {
     mongoose.connection.close();
+    console.log("end deleteElection")
+    
   }
 
 }
-
-
-const scheduleElectionEndCheck = (election) => {
-  const endDate = new Date(election.election_end);
-  const now = new Date();
-
-  // Calculate the time difference in milliseconds
-  const timeDiff = endDate.getTime() - now.getTime();
-
-  if (timeDiff > 0) {
-    setTimeout(() => {
-      triggerElectionEndFunction(election);
-    }, timeDiff);
-  }
-};
-
-const triggerElectionEndFunction = (election) => {
-  console.log(`Election ${election.election_name} has ended. Triggering end function.`);
-  // Add your desired functionality here
-  // Example: update election status, notify users, etc.
-};
 
 
 

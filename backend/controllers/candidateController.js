@@ -1,33 +1,24 @@
 // controllers/candidateController.js
 const Candidate = require("../models/candidateModel");
 const Election = require("../models/electionModel");
-const { checkNotEmpty, checkIfEmpty } = require("../Service/commonService");
+const { checkIfEmpty } = require("../Service/commonService");
 const mongoose = require("mongoose");
-const fs = require("fs");
-const path = require("path");
 
 async function getCandidates(req, res) {
   try {
+    console.log("run getCandidates")
     const { election_name } = req.body;
-
+    console.log("req.body",req.body)
     await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      
       dbName: "DemocracyU",
     });
-    console.log("MongoDB connected");
 
     let election = await Election.findOne({election_name : election_name});
     checkIfEmpty(election, "Election not found")
     let candidates = await Candidate.find({election_name : election_name});
     
     console.log("candidates ==> ",candidates)
-    // if (!checkIsStart(election)) {
-    //   throw new Error("Election not start yet"); // edit error text
-    // }
-    // if (checkIsEnd(election)) {
-    //   throw new Error("Election has been ended"); // edit error text
-    // }
     res.status(200).json(candidates);
   } catch (error) {
     console.log(error);
@@ -36,16 +27,17 @@ async function getCandidates(req, res) {
       .json({ error: error.message || "Failed to fetch candidates" });
   } finally {
     mongoose.connection.close();
+    console.log("end getCandidates")
   }
 }
 
 async function deleteCandidatebyID(req, res) {
   try {
+    console.log("run deleteCandidatebyID")
     let { election_name, student_id } = req.body;
-
+    console.log("req.body",req.body)
     await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+  
       dbName: "DemocracyU",
     });
 
@@ -60,18 +52,18 @@ async function deleteCandidatebyID(req, res) {
     res.status(500).json({ error: error.message || "Failed to delete voters" });
   } finally {
     mongoose.connection.close();
+    console.log("end deleteCandidatebyID")
   }
 }
 
 async function addCandidate(req, res) {
   try {
-    console.log("Connecting to MongoDB...");
+    console.log("run addCandidate")
     await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+   
       dbName: "DemocracyU",
     });
-    console.log("Connected to MongoDB");
+    
 
     let { election_name, candidate_list } = req.body;
     console.log("Received data:", { election_name, candidate_list });
@@ -173,7 +165,8 @@ async function addCandidate(req, res) {
       .status(500)
       .json({ error: error.message || "Failed to add candidates" });
   } finally {
-    console.log("Closing MongoDB connection...");
+    mongoose.connection.close();
+    console.log("end addCandidate")
   }
 }
 

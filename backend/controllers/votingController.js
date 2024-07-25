@@ -13,11 +13,12 @@ const {
 
 async function getVoteResult(req, res) {
   try {
+    console.log("run getVoteResult")
     const { election_name } = req.body;
+    console.log("req.body",req.body)
 
     await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+     
       dbName: "DemocracyU",
     });
 
@@ -28,7 +29,6 @@ async function getVoteResult(req, res) {
     if (!checkIsStart(Elections)) {
       throw new Error("Election not start yet"); // edit error text
     }
-    if (checkIsEnd(Elections)) {
       let voteResults = await VoteResult.aggregate([
         { $match: { election_name: election_name } },
         { $group: { _id: "$candidate_id", count: { $sum: 1 } } },
@@ -37,7 +37,7 @@ async function getVoteResult(req, res) {
 
       console.log(voteResults);
       res.status(200).json(voteResults);
-    }
+   
   } catch (error) {
     console.log(error);
     res
@@ -45,16 +45,18 @@ async function getVoteResult(req, res) {
       .json({ error: error.message || "Failed to cast vote result" });
   } finally {
     mongoose.connection.close();
+    console.log("end getVoteResult")
   }
 }
 
 async function getRank(req, res) {
   try {
+    console.log("run getRank")
     const { election_name } = req.body;
+    console.log("req.body",req.body)
 
     await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+     
       dbName: "DemocracyU",
     });
 
@@ -83,16 +85,17 @@ async function getRank(req, res) {
       .json({ error: error.message || "Failed to cast vote rank" });
   } finally {
     mongoose.connection.close();
+    console.log("end getRank")
   }
 }
 
 async function vote(req, res) {
   try {
+    console.log("run vote")
     const { election_name, candidate_Id, name, mail } = req.body;
-
+    console.log("req.body",req.body)
     await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      
       dbName: "DemocracyU",
     });
 
@@ -138,6 +141,7 @@ async function vote(req, res) {
     res.status(500).json({ error: error.message || "Failed to vote" });
   } finally {
     mongoose.connection.close();
+    console.log("end vote")
   }
 }
 
@@ -153,8 +157,7 @@ class Blockchain {
       mongoose.connection.close();
 
       await mongoose.connect(process.env.MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
+      
         dbName: "DemocracyU",
       });
       console.log("MongoDB Connected");

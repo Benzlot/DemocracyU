@@ -2,9 +2,9 @@
 const mongoose = require('mongoose');
 
 const candidateSchema = new mongoose.Schema({
-  id: { type: Number, unique: true },
+  id: Number,
   name: String,
-  student_id: { type: String, unique: true },
+  student_id: String,
   faculty: String,
   major: String,
   vision: String,

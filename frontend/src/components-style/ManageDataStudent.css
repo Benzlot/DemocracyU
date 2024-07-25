@@ -55,7 +55,7 @@ font-size: 18px;
 }
 @media (max-width: 1000px) {
     h1{
-        font-size: 5vw;
+        font-size: 4vw;
     }
     .VImg{
         width: 10vw;

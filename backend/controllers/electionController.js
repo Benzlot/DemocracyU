@@ -5,6 +5,15 @@ const Candidate = require('../models/candidateModel');
 const mongoose = require('mongoose');
 const { checkNotEmptyThrowError ,checkIfEmpty } = require('../Service/commonService');
 
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected to ' + process.env.MONGODB_URI);
+});
+mongoose.connection.on('error', (err) => {
+  console.log('Mongoose connection error: ' + err);
+});
+mongoose.connection.on('disconnected', () => {
+  console.log('Mongoose disconnected');
+});
 
 async function getElection (req, res) {
   try {
@@ -21,7 +30,9 @@ async function getElection (req, res) {
     console.error(error)
     res.status(500).json({ error: error.message ||'Failed to fetch Election' });
   } finally {
-    mongoose.connection.close();
+    if (mongoose.connection.readyState === 1) {
+      mongoose.connection.close();
+    }
     console.log("end getElection")
   }
 };
@@ -44,7 +55,9 @@ async function getElectionbyName (req, res) {
     console.error("error",error)
     res.status(500).json({ error: 'Failed to fetch Election' });
   } finally {
-    mongoose.connection.close();
+    if (mongoose.connection.readyState === 1) {
+      mongoose.connection.close();
+    }
     console.log("end getElectionbyName")
   }
 };
@@ -91,7 +104,9 @@ async function addElection (req, res) {
     console.log(error)
     res.status(500).json({error: error.message|| 'Failed to fetch Election' });
   } finally {
-    mongoose.connection.close();
+    if (mongoose.connection.readyState === 1) {
+      mongoose.connection.close();
+    }
     console.log("end addElection")
   }
 
@@ -123,7 +138,9 @@ async function updateElection (req, res) {
     console.log(error)
     res.status(500).json({ error:error.message|| 'Failed to fetch Election' });
   } finally {
-    mongoose.connection.close();
+    if (mongoose.connection.readyState === 1) {
+      mongoose.connection.close();
+    }
     console.log("end updateElection")
   }
 
@@ -152,7 +169,9 @@ async function deleteElection (req, res) {
     console.log(error)
     res.status(500).json({ error: error.message||'Failed to fetch Election' });
   } finally {
-    mongoose.connection.close();
+    if (mongoose.connection.readyState === 1) {
+      mongoose.connection.close();
+    }
     console.log("end deleteElection")
     
   }

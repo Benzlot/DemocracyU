@@ -4,6 +4,16 @@ const Voter = require('../models/voterModel');
 const { checkNotEmpty,checkIfEmpty } = require('../Service/commonService');
 const mongoose = require('mongoose');
 
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected to ' + process.env.MONGODB_URI);
+});
+mongoose.connection.on('error', (err) => {
+  console.log('Mongoose connection error: ' + err);
+});
+mongoose.connection.on('disconnected', () => {
+  console.log('Mongoose disconnected');
+});
+
 async function getVoter (req, res) {
   try {
     console.log("run getVoter")
@@ -25,7 +35,9 @@ async function getVoter (req, res) {
     console.log(error)
     res.status(500).json({ error: error.message ||'Failed to fetch voters' });
   } finally {
-    mongoose.connection.close();
+    if (mongoose.connection.readyState === 1) {
+      mongoose.connection.close();
+    }
     console.log("end getVoter")
   }
 };
@@ -56,7 +68,9 @@ async function getVoterStatus (req,res){
       console.log(error)
       res.status(500).json({ error: error.message ||'Failed to fetch voters' });
   } finally {
+    if (mongoose.connection.readyState === 1) {
       mongoose.connection.close();
+    }
       console.log("end getVoterStatus")
   }
 }
@@ -115,7 +129,9 @@ async function addVoter (req, res) {
     console.log(error)
     res.status(500).json({ error: error.message ||'Failed to add voters' });
   } finally {
-    mongoose.connection.close();
+    if (mongoose.connection.readyState === 1) {
+      mongoose.connection.close();
+    }
     console.log("end addVoter")
   }
 
@@ -142,7 +158,9 @@ async function deleteVoterbyID (req, res){
   console.log(error)
   res.status(500).json({ error: error.message ||'Failed to delete voters' });
 } finally {
-  mongoose.connection.close();
+  if (mongoose.connection.readyState === 1) {
+    mongoose.connection.close();
+  }
   console.log("end deleteVoterbyID")
 }
 }
@@ -169,7 +187,9 @@ async function getVoterByMail (req, res){
     console.log(error)
     res.status(500).json({ error: error.message ||'Failed to get voter' });
   } finally {
-    mongoose.connection.close();
+    if (mongoose.connection.readyState === 1) {
+      mongoose.connection.close();
+    }
     console.log("end getVoterByMail")
   }
 }

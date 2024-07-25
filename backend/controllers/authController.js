@@ -2,6 +2,16 @@
 const Admin = require('../models/adminModel');
 const mongoose = require('mongoose');
 
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected to ' + process.env.MONGODB_URI);
+});
+mongoose.connection.on('error', (err) => {
+  console.log('Mongoose connection error: ' + err);
+});
+mongoose.connection.on('disconnected', () => {
+  console.log('Mongoose disconnected');
+});
+
 async function checkAdmin (req, res) {
   try {
     console.log("run checkAdmin")
@@ -21,7 +31,9 @@ async function checkAdmin (req, res) {
     console.error("error",error)
     res.status(500).json({ error: error.message||'Failed to fetch candidates' });
   } finally {
-    mongoose.connection.close();
+    if (mongoose.connection.readyState === 1) {
+      mongoose.connection.close();
+    }
     console.log("end checkAdmin")
   }
 };

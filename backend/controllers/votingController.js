@@ -11,6 +11,16 @@ const {
   checkIsEnd,
 } = require("../Service/commonService");
 
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected to ' + process.env.MONGODB_URI);
+});
+mongoose.connection.on('error', (err) => {
+  console.log('Mongoose connection error: ' + err);
+});
+mongoose.connection.on('disconnected', () => {
+  console.log('Mongoose disconnected');
+});
+
 async function getVoteResult(req, res) {
   try {
     console.log("run getVoteResult")
@@ -43,7 +53,9 @@ async function getVoteResult(req, res) {
       .status(500)
       .json({ error: error.message || "Failed to cast vote result" });
   } finally {
-    mongoose.connection.close();
+    if (mongoose.connection.readyState === 1) {
+      mongoose.connection.close();
+    }
     console.log("end getVoteResult")
   }
 }
@@ -82,7 +94,9 @@ async function getRank(req, res) {
       .status(500)
       .json({ error: error.message || "Failed to cast vote rank" });
   } finally {
-    mongoose.connection.close();
+    if (mongoose.connection.readyState === 1) {
+      mongoose.connection.close();
+    }
     console.log("end getRank")
   }
 }
@@ -137,7 +151,9 @@ async function vote(req, res) {
     console.log(error);
     res.status(500).json({ error: error.message || "Failed to vote" });
   } finally {
-    mongoose.connection.close();
+    if (mongoose.connection.readyState === 1) {
+      mongoose.connection.close();
+    }
     console.log("end vote")
   }
 }
@@ -151,7 +167,9 @@ class Blockchain {
 
   async initialize(model) {
     try {
-      mongoose.connection.close();
+      if (mongoose.connection.readyState === 1) {
+        mongoose.connection.close();
+      }
 
       await mongoose.connect(process.env.MONGODB_URI, {
         dbName: "DemocracyU",

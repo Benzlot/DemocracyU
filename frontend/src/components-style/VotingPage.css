@@ -4,6 +4,7 @@
     justify-content: center; /* Centers content vertically */
     margin: 3vw auto; /* Auto margins to center the element */
     text-align: center; /* Centers text inside the component */
+    
   }
   .VTitle img{
     margin: 0;

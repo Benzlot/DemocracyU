@@ -66,12 +66,10 @@ function checkIsEnd (election){
     const endDate = new Date(election.election_end);
     const now = new Date();
     
-    const timeDiff = endDate.getTime() - now.getTime(); //เอาเวลาจบลบเวลาปัจจุบัน
-
-    if(timeDiff > 0){
-        return false //ยังไม่จบ
-    }else{
-        return true //จบแล้ว
+    if (now > endDate) {
+      return true; 
+    } else {
+      return false; 
     }
 }
 
@@ -79,12 +77,10 @@ function checkIsStart (election){
     const startDate = new Date(election.election_start);
     const now = new Date();
     
-    const timeDiff = now.getTime() - startDate.getTime(); //เอาเวลาปัจจุบันลบเวลาเริ่ม
-
-    if(timeDiff > 0){
-        return true //เริ่มแล้ว
-    }else{
-        return false //ยังไม่เริ่ม
+    if (now < startDate) {
+      return false; 
+    } else {
+      return true; 
     }
 }
 

@@ -44,14 +44,14 @@ const UserDashboard = () => {
   async function handleDateChange() {
     setIsLoading(true);
     try {
-      const elections = await getElectionbyName(electionName); // Fetch election data
+      const elections = await getElectionbyName(electionName); 
       const now = new Date();
       const electionStart = new Date(elections.election_start);
       const electionEnd = new Date(elections.election_end);
       if (now < electionStart || now > electionEnd) {
-        setIsButtonVisible(false); // Hide button if not within the date range
+        setIsButtonVisible(false); 
       } else {
-        setIsButtonVisible(true); // Show button if within the date range
+        setIsButtonVisible(true); 
       }
     } catch (error) {
       console.error('Failed to handle date change:', error);
@@ -65,10 +65,9 @@ const UserDashboard = () => {
       checkStatusMail(account.username);
     }
     handleDateChange();
-  }, [account?.name, userData]); // Added account?.name to dependencies
+  }, [account?.name, userData]); 
 
   if (isLoading) {
-    // Render spinner while loading
     return (
       <div
         style={{

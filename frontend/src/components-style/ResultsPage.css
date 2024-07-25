@@ -1,177 +1,235 @@
 .results-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-}
-
-.result-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.result-img {
-  max-width: 100%;
-  height: auto;
-}
-
-.result-title h1 {
-  font-size: 24px;
-  margin-top: 10px;
-  text-align: center;
-}
-
-.election-results {
-  display: flex;
-  width: 70rem;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  padding: 5vw 5vw 0vw 20vw;
-}
-.eRe {
-  justify-content: center;
-  display: grid;
-}
-.chart-container {
-  position: relative;
-  width: 300px;
-  height: 300px;
-}
-
-.chart-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  font-size: 18px;
-  font-weight: bold;
-}
-.canImg {
-  max-width: 40%;
-}
-.legend {
-  flex-direction: column;
-  margin-top: 10px;
-}
-
-.legend div {
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
-.legend div span {
-  width: 15px;
-  height: 15px;
-  display: inline-block;
-  margin-right: 5px;
-}
-
-.candidates-container {
-  margin-left: 10rem;
-}
-
-.candidate {
-  width: 60%;
-  color: #fff;
-}
-
-.candidate-rank {
-  font-size: 24px;
-  margin-right: 10px;
-}
-
-.candidate-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.candidate-name {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.candidate-votescount {
-  font-size: 20px;
-  color: white;
-}
-.Result {
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.ResultName {
-  text-align: center;
-  font-size: 1.1vw;
-}
-.Notoff {
-  display: flex;
-  justify-content: center;
-  margin-bottom: -7vw;
-}
-
-.ReImg {
-  width: 15vw;
-  height: 15vw;
-}
-.candidates-container .candidate {
-  transition: transform 500s ease;
-}
-.candidate {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-  padding: 8px;
-  border-radius: 5px;
-}
-
-.candidate-rank {
-  font-weight: bold;
-  margin-right: 10px;
-}
-
-.candidate-info {
-  position: relative;
-}
-
-.candidate-name {
-  position: relative;
-  z-index: 1;
-}
-@media (max-width: 1300px) {
-    .candidates-container {
-        margin-left: 5rem;
-      }
-    .election-results {
-        width: 50rem;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        padding: 5vw 5vw 0vw 5vw;
-      }
-
-      .chart-container {
-        position: relative;
-        width: 300px;
-        height: 300px;
-      }
-      
-      .chart-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
-      }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
   }
-@media (max-width: 1000px) {
-  .RTitle h1 {
+  
+  .result-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .result-img {
+    max-width: 100%;
+    height: auto;
+  }
+  .CcanInfo{
+    margin-right: 2rem;
+  }
+  .result-title h1 {
+    font-size: 24px;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .election-results {
+    display: flex;
+    flex-direction: row; /* Default to row layout */
+    width: 100%;
+
+    border-radius: 10px;
+
+    padding: 5vw 5vw 0vw 20vw;
+    gap: 2rem; /* Space between chart and candidates */
+  }
+  
+  .eRe {
+    justify-content: center;
+    display: grid;
+  }
+  
+  .chart-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+  }
+  
+  .chart-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .canImg {
+    max-width: 40%;
+  }
+  
+  .legend {
+    flex-direction: column;
+    margin-top: 10px;
+  }
+  
+  .legend div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  
+  .legend div span {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    margin-right: 5px;
+  }
+  
+  .candidates-container {
+    margin-left: 10rem;
+  }
+  
+  .candidate {
+    width: 60%;
+    color: #fff;
+  }
+  
+  .candidate-rank {
     font-size: 3vw;
+    margin-right: 10px;
   }
-}
+  
+  .candidate-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .candidate-nme {
+    font-size: 2vw;
+    font-weight: bold;
+  }
+  
+  .candidate-votescount {
+    font-size: 20px;
+    color: white;
+  }
+  
+  .Result {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .ResultName {
+    text-align: center;
+    font-size: 1.1vw;
+  }
+  
+  .Notoff {
+    display: flex;
+    justify-content: center;
+    margin-bottom: -7vw;
+  }
+  
+  .ReImg {
+    width: 15vw;
+    height: 15vw;
+  }
+  
+  .candidates-container .candidate {
+    transition: transform 500s ease;
+  }
+  
+  .candidate {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 5px;
+  }
+  
+  .candidate-rank {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  .candidate-info {
+    position: relative;
+  }
+  
+  .candidate-nme {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Media Query for <= 1400px */
+  @media (max-width: 1400px) {
+    .candidates-container {
+      margin-left: 5rem;
+    }
+  
+    .election-results {
+      width: 100%;
+      padding: 5vw 5vw 0vw 5vw;
+    }
+  
+    .chart-container {
+      width: 200px;
+      height: 200px;
+    }
+    
+    .chart-text {
+      font-size: 2vw;
+    }
+  }
+  
+  /* Media Query for <= 1000px */
+  @media (max-width: 1000px) {
+    .election-results {
+      flex-direction: row; /* Stack chart and candidates in a row */
+      width: 0%; /* Make the container responsive */
+      padding: 1rem; /* Adjust padding for smaller screens */
+      gap: 1rem; /* Space between chart and candidates */
+      width: 90%;
+    }
+    .legend{
+        font-size: 2vw;
+    }
+  
+    .chart-container {
+      width: 200px; /* Adjust width */
+      height: 200px; /* Adjust height */
+      margin-left: 7rem;
+    }
+  
+    .chart-text {
+      font-size: 2vw; /* Adjust font size */
+    }
+    .Rone{
+        font-size: 3vw;
+    }
+  
+    .candidates-container {
+      width: 50%; /* Full width */
+      margin-left: 5rem; /* Remove margin-left */
+    }
+  
+    .candidate {
+      width: 100%; /* Full width for better fit */
+      margin: 0.5rem 0; /* Adjust margin for spacing */
+      padding: 6px; /* Adjust padding */
+    }
+  
+    @media (max-width:400px) {
+        .CcanInfo{
+            margin-left: 2rem;
+          }
+    }
+    .canImg{
+        max-width: 30%;
+    }
+    .candidate-nme{
+        font-size: 2.5vw;
+    }
+    .candidate-rank{
+        font-size: 5vw;
+    }
+    .candidate-votescount{
+        font-size: 3vw;
+    }
+ 
+  }
+  

@@ -19,6 +19,15 @@ const VotingPage = () => {
   const [status, setStatus] = useState(userData.status);
   const [isLoading, setIsLoading] = useState(false);
   const [isButtonVisible, setIsButtonVisible] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
   const navigate = useNavigate();
 
   async function fetchCandidate() {

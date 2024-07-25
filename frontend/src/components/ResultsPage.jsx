@@ -150,7 +150,7 @@ const ResultsPage = () => {
           />
         </div>
         <div className="RTitle">
-          <h1>
+          <h1 className='Rone'>
             {isElectionEnded
               ? 'ผลคะแนนการเลือกตั้งอย่างเป็นทางการ'
               : 'ผลคะแนนการเลือกตั้งอย่างไม่เป็นทางการ'}
@@ -187,7 +187,7 @@ const ResultsPage = () => {
                   <img className="canImg" src={item.imageSrc} alt={item.name} />
                   <div className='CcanInfo'>
                   <div className="candidate-rank">{item.index + 1}</div>
-                  <div className="candidate-name">{item.name}</div>
+                  <div className="candidate-nme">{item.name}</div>
                   <div className="candidate-votescount">{item.votes} votes</div>
                   </div>
                  

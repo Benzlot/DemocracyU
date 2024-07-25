@@ -89,15 +89,9 @@ async function vote(req, res) {
    
 
     let Elections = await Election.findOne({ election_name: election_name });
-    //check election exist
+  
     checkIfEmpty(Elections, "Election not found");
-    // if (!checkIsStart(Elections)) {
-    //   throw new Error("Election not start yet"); // edit error text
-    // }
-    // if (checkIsEnd(Elections)) {
-    //   throw new Error("Election has been ended"); // edit error text
-    // }
-    //check candidate exist
+ 
     let candidates = await Candidate.findOne({
       id: candidate_Id,
       election_name: election_name,

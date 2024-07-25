@@ -21,9 +21,6 @@ async function getVoteResult(req, res) {
     //check election exist
     checkIfEmpty(Elections, "Election not found");
 
-    if (!checkIsStart(Elections)) {
-      throw new Error("Election not start yet"); // edit error text
-    }
       let voteResults = await VoteResult.aggregate([
         { $match: { election_name: election_name } },
         { $group: { _id: "$candidate_id", count: { $sum: 1 } } },
@@ -50,15 +47,9 @@ async function getRank(req, res) {
     const { election_name } = req.body;
     console.log("req.body",req.body)
 
-   
-
     let Elections = await Election.findOne({ election_name: election_name });
-    //check election exist
     checkIfEmpty(Elections, "Election not found");
-    if (!checkIsStart(Elections)) {
-      throw new Error("Election not start yet"); // edit error text
-    }
-    if (checkIsEnd(Elections)) {
+
       let voteResults = await VoteResult.aggregate([
         { $match: { election_name: election_name } },
         { $group: { _id: "$candidate_id", count: { $sum: 1 } } },
@@ -67,9 +58,7 @@ async function getRank(req, res) {
 
       console.log(voteResults);
       res.status(200).json(voteResults);
-    } else {
-      throw new Error("Election not end yet"); // edit error text
-    }
+    
   } catch (error) {
     console.log(error);
     res
@@ -97,7 +86,6 @@ async function vote(req, res) {
       election_name: election_name,
     });
     checkIfEmpty(candidates, "Candidate not found");
-    //check
     let voters = await Voter.findOne({
       mail: mail,
       election_name: election_name,
@@ -115,7 +103,6 @@ async function vote(req, res) {
 
     await blockchain.addBlock(candidate_Id, election_name, hashed_data);
 
-    //Add edit status user after vote <-- ปรับเป้นผู้ไม่สิทธิ์โหวตด้วย
     await Voter.updateOne({ mail: mail }, { $set: { status: "1" } });
 
     res.status(200).json({ message: "Vote cast successfully" });

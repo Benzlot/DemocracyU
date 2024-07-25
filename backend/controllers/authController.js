@@ -1,6 +1,5 @@
 // controllers/candidateController.js
 const Admin = require('../models/adminModel');
-const mongoose = require('mongoose');
 
 async function checkAdmin (req, res) {
   try {
@@ -8,9 +7,7 @@ async function checkAdmin (req, res) {
     const { mail } = req.body;
     console.log("req.body",req.body)
 
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: 'DemocracyU',
-    });
+   
 
       
     let admin = await Admin.findOne({ mail: mail }).lean().exec();
@@ -21,9 +18,7 @@ async function checkAdmin (req, res) {
     console.error("error",error)
     res.status(500).json({ error: error.message||'Failed to fetch candidates' });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+  
     console.log("end checkAdmin")
   }
 };

@@ -1,5 +1,4 @@
 const crypto = require("crypto");
-const mongoose = require("mongoose");
 const Candidate = require("../models/candidateModel");
 const VoteResult = require("../models/votingModel");
 const Voter = require("../models/voterModel");
@@ -17,9 +16,6 @@ async function getVoteResult(req, res) {
     const { election_name } = req.body;
     console.log("req.body",req.body)
 
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: "DemocracyU",
-    });
 
     let Elections = await Election.findOne({ election_name: election_name });
     //check election exist
@@ -43,9 +39,7 @@ async function getVoteResult(req, res) {
       .status(500)
       .json({ error: error.message || "Failed to cast vote result" });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+   
     console.log("end getVoteResult")
   }
 }
@@ -56,9 +50,7 @@ async function getRank(req, res) {
     const { election_name } = req.body;
     console.log("req.body",req.body)
 
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: "DemocracyU",
-    });
+   
 
     let Elections = await Election.findOne({ election_name: election_name });
     //check election exist
@@ -84,9 +76,7 @@ async function getRank(req, res) {
       .status(500)
       .json({ error: error.message || "Failed to cast vote rank" });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+   
     console.log("end getRank")
   }
 }
@@ -96,9 +86,7 @@ async function vote(req, res) {
     console.log("run vote")
     const { election_name, candidate_Id, name, mail } = req.body;
     console.log("req.body",req.body)
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: "DemocracyU",
-    });
+   
 
     let Elections = await Election.findOne({ election_name: election_name });
     //check election exist
@@ -141,9 +129,7 @@ async function vote(req, res) {
     console.log(error);
     res.status(500).json({ error: error.message || "Failed to vote" });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+   
     console.log("end vote")
   }
 }
@@ -157,23 +143,12 @@ class Blockchain {
 
   async initialize(model) {
     try {
-      if (mongoose.connection.readyState === 1) {
-        mongoose.connection.close();
-      }
-
-      await mongoose.connect(process.env.MONGODB_URI, {
-        dbName: "DemocracyU",
-      });
-      console.log("MongoDB Connected");
-
       this.model = model;
       // Initialize blockchain operations
       await this.createGenesisBlock();
-      // Other initialization tasks can be added here
     } catch (error) {
-      console.error("MongoDB Connection Error:", error);
-      // Handle error appropriately
-      throw error; // Rethrow the error or handle it as needed
+      console.error(error);
+      throw error; 
     }
   }
 

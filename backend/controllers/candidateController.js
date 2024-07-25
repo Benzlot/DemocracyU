@@ -2,16 +2,13 @@
 const Candidate = require("../models/candidateModel");
 const Election = require("../models/electionModel");
 const { checkIfEmpty } = require("../Service/commonService");
-const mongoose = require("mongoose");
 
 async function getCandidates(req, res) {
   try {
     console.log("run getCandidates")
     const { election_name } = req.body;
     console.log("req.body",req.body)
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: "DemocracyU",
-    });
+ 
 
     let election = await Election.findOne({election_name : election_name});
     checkIfEmpty(election, "Election not found")
@@ -23,9 +20,7 @@ async function getCandidates(req, res) {
     console.log(error);
     res.status(500).json({ error: error.message || "Failed to fetch candidates" });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+    
     console.log("end getCandidates")
   }
 }
@@ -35,9 +30,7 @@ async function deleteCandidatebyID(req, res) {
     console.log("run deleteCandidatebyID")
     let { election_name, student_id } = req.body;
     console.log("req.body",req.body)
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: "DemocracyU",
-    });
+
 
     let Elections = await Election.findOne({ election_name: election_name });
     checkIfEmpty(Elections, "Election not found");
@@ -49,9 +42,7 @@ async function deleteCandidatebyID(req, res) {
     console.log(error);
     res.status(500).json({ error: error.message || "Failed to delete voters" });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+
     console.log("end deleteCandidatebyID")
   }
 }
@@ -59,9 +50,7 @@ async function deleteCandidatebyID(req, res) {
 async function addCandidate(req, res) {
   try {
     console.log("run addCandidate")
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: "DemocracyU",
-    });
+ 
     
 
     let { election_name, candidate_list } = req.body;
@@ -164,9 +153,7 @@ async function addCandidate(req, res) {
       .status(500)
       .json({ error: error.message || "Failed to add candidates" });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+   
     console.log("end addCandidate")
   }
 }

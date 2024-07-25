@@ -2,16 +2,12 @@
 const Election = require('../models/electionModel');
 const Voter = require('../models/voterModel');
 const Candidate = require('../models/candidateModel');
-const mongoose = require('mongoose');
 const { checkNotEmptyThrowError ,checkIfEmpty } = require('../Service/commonService');
 
 async function getElection (req, res) {
   try {
     console.log("run getElection")
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: 'DemocracyU',
-    });
-      
+  
     let Elections = await Election.find();
 
     console.log("Election ==> ",Elections)
@@ -20,9 +16,7 @@ async function getElection (req, res) {
     console.error(error)
     res.status(500).json({ error: error.message ||'Failed to fetch Election' });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+   
     console.log("end getElection")
   }
 };
@@ -32,9 +26,7 @@ async function getElectionbyName (req, res) {
     console.log("run getElectionbyName")
     let {election_name} = req.body
     console.log("req.body",req.body)
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: 'DemocracyU',
-    });
+   
       
     let Elections = await Election.findOne({election_name : election_name});
     checkIfEmpty(Elections, "Election not found")
@@ -45,20 +37,14 @@ async function getElectionbyName (req, res) {
     console.error("error",error)
     res.status(500).json({ error: 'Failed to fetch Election' });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+   
     console.log("end getElectionbyName")
   }
 };
 
 async function addElection (req, res) {
   try {
-    console.log("run addElection")
-    await mongoose.connect(process.env.MONGODB_URI, {
-    
-      dbName: 'DemocracyU',
-    });
+  
 
     let {election_name,election_type,start_date,end_date} = req.body
     console.log("req.body",req.body)
@@ -94,9 +80,7 @@ async function addElection (req, res) {
     console.log(error)
     res.status(500).json({error: error.message|| 'Failed to fetch Election' });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+   
     console.log("end addElection")
   }
 
@@ -105,9 +89,7 @@ async function addElection (req, res) {
 async function updateElection (req, res) {
   try {
     console.log("run updateElection")
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: 'DemocracyU',
-    });
+    
 
     let {election_name,election_type,start_date,end_date} = req.body
     console.log("req.body",req.body);
@@ -128,9 +110,7 @@ async function updateElection (req, res) {
     console.log(error)
     res.status(500).json({ error:error.message|| 'Failed to fetch Election' });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+  
     console.log("end updateElection")
   }
 
@@ -139,10 +119,7 @@ async function updateElection (req, res) {
 async function deleteElection (req, res) {
   try {
     console.log("run deleteElection")
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: 'DemocracyU',
-    });
-
+  
     let {election_name} = req.body
     console.log("req.body",req.body);
 
@@ -159,9 +136,7 @@ async function deleteElection (req, res) {
     console.log(error)
     res.status(500).json({ error: error.message||'Failed to fetch Election' });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+   
     console.log("end deleteElection")
     
   }

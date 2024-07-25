@@ -2,17 +2,13 @@
 const Election = require('../models/electionModel');
 const Voter = require('../models/voterModel');
 const { checkNotEmpty,checkIfEmpty } = require('../Service/commonService');
-const mongoose = require('mongoose');
 
 async function getVoter (req, res) {
   try {
     console.log("run getVoter")
     const { election_name } = req.body
     console.log("req.body",req.body)
-    await mongoose.connect(process.env.MONGODB_URI, {
-  
-      dbName: 'DemocracyU',
-    });
+   
       
     let Elections = await Election.findOne({election_name : election_name});
     checkIfEmpty(Elections, "Election not found")
@@ -25,9 +21,7 @@ async function getVoter (req, res) {
     console.log(error)
     res.status(500).json({ error: error.message ||'Failed to fetch voters' });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+
     console.log("end getVoter")
   }
 };
@@ -37,10 +31,7 @@ async function getVoterStatus (req,res){
       console.log("run getVoterStatus")
       const { election_name } = req.body
       console.log("req.body",req.body)
-      await mongoose.connect(process.env.MONGODB_URI, {
-        
-        dbName: 'DemocracyU',
-      });
+    
         
       let Elections = await Election.findOne({election_name : election_name});
       checkIfEmpty(Elections, "Election not found")
@@ -58,9 +49,7 @@ async function getVoterStatus (req,res){
       console.log(error)
       res.status(500).json({ error: error.message ||'Failed to fetch voters' });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+ 
       console.log("end getVoterStatus")
   }
 }
@@ -89,9 +78,7 @@ async function addVoter (req, res) {
     console.log("run addVoter")
     let {election_name, student_list} = req.body
     console.log("req.body",req.body)
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: 'DemocracyU',
-    });
+   
        
     let Elections = await Election.findOne({election_name : election_name});
     checkIfEmpty(Elections, "Election not found")
@@ -119,9 +106,7 @@ async function addVoter (req, res) {
     console.log(error)
     res.status(500).json({ error: error.message ||'Failed to add voters' });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+  
     console.log("end addVoter")
   }
 
@@ -132,10 +117,7 @@ async function deleteVoterbyID (req, res){
     console.log("run deleteVoterbyID")
   let {election_name, student_id} = req.body
   console.log("req.body",req.body)
-  await mongoose.connect(process.env.MONGODB_URI, {
-    
-    dbName: 'DemocracyU',
-  });
+
      
   let Elections = await Election.findOne({election_name : election_name});
   checkIfEmpty(Elections, "Election not found")
@@ -148,9 +130,7 @@ async function deleteVoterbyID (req, res){
   console.log(error)
   res.status(500).json({ error: error.message ||'Failed to delete voters' });
 } finally {
-  if (mongoose.connection.readyState === 1) {
-    mongoose.connection.close();
-  }
+  
   console.log("end deleteVoterbyID")
 }
 }
@@ -161,10 +141,7 @@ async function getVoterByMail (req, res){
     let {mail} = req.body
     console.log("req.body",req.body)
 
-    await mongoose.connect(process.env.MONGODB_URI, {
    
-      dbName: 'DemocracyU',
-    });
       
     // let Elections = await Election.findOne({election_name : election_name});
     const voter = await Voter.findOne({ mail : mail})
@@ -177,9 +154,7 @@ async function getVoterByMail (req, res){
     console.log(error)
     res.status(500).json({ error: error.message ||'Failed to get voter' });
   } finally {
-    if (mongoose.connection.readyState === 1) {
-      mongoose.connection.close();
-    }
+   
     console.log("end getVoterByMail")
   }
 }

@@ -2,6 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const { connectToDatabase, closeDatabaseConnection } = require('./Service/mongoDBService')
 require('dotenv').config();
 
 const app = express();
@@ -39,9 +40,26 @@ app.use('/', (req, res)=>{
   console.log(req.body);
   res.send('Not found');
 })
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+connectToDatabase().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 });
+
+
 app.on("error",(error)=>{
   console.log(error)
 })
+
+process.on('SIGINT', async () => {
+  console.log('SIGINT received: closing database connection');
+  await closeDatabaseConnection();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received: closing database connection');
+  await closeDatabaseConnection();
+  process.exit(0);
+});

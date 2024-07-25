@@ -18,12 +18,23 @@ const votingRoutes = require('./routes/votingRoutes');
 const electionRoutes = require('./routes/electionRoutes')
 const votersRoutes = require('./routes/voterRoutes')
 
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected to ' + process.env.MONGODB_URI);
+});
+mongoose.connection.on('error', (err) => {
+  console.log('Mongoose connection error: ' + err);
+});
+mongoose.connection.on('disconnected', () => {
+  console.log('Mongoose disconnected');
+});
+
 app.use('/api/candidates', candidateRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admins', adminRoutes);
 app.use('/api/vote', votingRoutes);
 app.use('/api/elections',electionRoutes)
 app.use('/api/voters', votersRoutes)
+
 app.use('/', (req, res)=>{
   console.log(req.body);
   res.send('Not found');

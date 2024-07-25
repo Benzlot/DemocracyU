@@ -4,16 +4,6 @@ const Voter = require('../models/voterModel');
 const { checkNotEmpty,checkIfEmpty } = require('../Service/commonService');
 const mongoose = require('mongoose');
 
-mongoose.connection.on('connected', () => {
-  console.log('Mongoose connected to ' + process.env.MONGODB_URI);
-});
-mongoose.connection.on('error', (err) => {
-  console.log('Mongoose connection error: ' + err);
-});
-mongoose.connection.on('disconnected', () => {
-  console.log('Mongoose disconnected');
-});
-
 async function getVoter (req, res) {
   try {
     console.log("run getVoter")

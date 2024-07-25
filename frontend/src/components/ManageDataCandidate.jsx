@@ -152,7 +152,7 @@ const ManageDataCandidate = () => {
                     faculty: candidate.faculty,
                     major: candidate.major,
                     vision: candidate.vision,
-                    image: `/uploads/${candidate.img.path}`
+                    image: candidate.img.path || 'https://i.imghippo.com/files/YeJ7o1721571932.png'
             }));
 
             setCandidates(candidateListMapped);

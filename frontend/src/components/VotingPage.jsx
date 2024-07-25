@@ -4,7 +4,6 @@ import CandidateCard from './CandidateCard';
 import '../components-style/VotingPage.css';
 import { getCandidates } from '../services/candidateService';
 import { getElectionbyName } from '../services/electionService'; // Ensure this function is available
-import { getVoterByMail } from '../services/voterService';
 import '../components-style/Navbar.css';
 import '../components-style/UserDB.css';
 import { Link, useNavigate } from 'react-router-dom';
@@ -37,37 +36,40 @@ const VotingPage = () => {
 
   async function checkElectionStatus() {
     try {
-      const rawData = await getElectionbyName(electionName); // Fetch election data
-      const elections = rawData.map((data) => ({
-        start: data.election_start,
-        end: data.election_end,
-      }));
-        const now = new Date();
-        if (now > elections.end) {
-          setIsButtonVisible(false);
-          Swal.fire({
-            title: 'Voting has ended',
-            text: 'You will be redirected to the results page.',
-            icon: 'info',
-            confirmButtonText: 'OK',
-          }).then(() => {
-            navigate('/results');
-          });
-        } else if (now < elections.start) {
-          setIsButtonVisible(true);
-        }
+      const elections = await getElectionbyName(electionName); // Fetch election data
+      console.log("Election data:", elections);
+      const now = new Date();
+      const electionStart = new Date(elections.election_start);
+      const electionEnd = new Date(elections.election_end);
+      console.log("Current time:", now);
+      console.log("Election start time:", electionStart);
+      console.log("Election end time:", electionEnd);
+
+      if (now > electionEnd) {
+        setIsButtonVisible(false);
+        Swal.fire({
+          title: 'Voting has ended',
+          text: 'You will be redirected to the results page.',
+          icon: 'info',
+          confirmButtonText: 'OK',
+        }).then(() => {
+          navigate('/results');
+        });
+      } else if (now < electionStart) {
+        setIsButtonVisible(true);
+      }
     } catch (error) {
       console.error("Failed to check election status:", error);
     }
   }
 
   useEffect(() => {
-  
+    console.log("status", status)
     userData.status = status;
     checkElectionStatus();
-    if (status === "0") {
+    if (status == "0") { 
       fetchCandidate();
-    } else if (status === "1") {
+    } else if (status == "1") {
       navigate('/results');
     }
   }, [status]);
@@ -77,7 +79,7 @@ const VotingPage = () => {
       .filter((data) => data.id !== 0) // Filter out items where id is 0
       .map((data) => ({
         id: data.id, // Assuming id is unique and can be used as key
-        imageSrc: `/uploads/${data.img.path}` || 'https://i.imghippo.com/files/YeJ7o1721571932.png', // Example placeholder URL
+        imageSrc: data.img.path || 'https://i.imghippo.com/files/YeJ7o1721571932.png', // Example placeholder URL
         candidateName: data.name || 'Candidate Name', // Example fallback text
         description: data.vision || 'Candidate Vision', // Example fallback text
       }));
@@ -98,7 +100,9 @@ const VotingPage = () => {
 
     try {
       await castVote(electionName, id, account.name, account.username);
-      Swal.fire('Vote cast successfully!');
+      Swal.fire('Vote cast successfully!').then(() => {
+        setStatus(1); // Update status to indicate that the vote has been cast
+      });
     } catch (error) {
       console.error('Failed to cast vote:', error);
       Swal.fire('Failed to cast vote. Please try again.');
@@ -127,7 +131,6 @@ const VotingPage = () => {
     if (email === account.username) {
       Swal.fire(`Entered email: ${email}`);
       await handleVote(vote.id);
-      setStatus(1);
     } else {
       Swal.fire(`Email not match`);
     }

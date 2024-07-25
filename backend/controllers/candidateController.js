@@ -49,9 +49,7 @@ async function deleteCandidatebyID(req, res) {
 
 async function addCandidate(req, res) {
   try {
-    console.log("run addCandidate")
- 
-    
+    console.log("run addCandidate");
 
     let { election_name, candidate_list } = req.body;
     console.log("Received data:", { election_name, candidate_list });
@@ -69,8 +67,6 @@ async function addCandidate(req, res) {
     }
     console.log("Election found:", Elections);
 
-    // Aggregate to get the max ID
-
     console.log("Getting max ID...");
     let maxIdResult = await Candidate.aggregate([
       {
@@ -87,11 +83,7 @@ async function addCandidate(req, res) {
     const uploadedFiles = req.files;
     console.log("Files uploaded:", uploadedFiles);
 
-    const fileMap = [];
-    uploadedFiles.forEach((file, index) => {
-      console.log(`File received: ${file.fieldname} -> ${file.filename}`);
-      fileMap[index] = file.filename;
-    });
+    const fileMap = uploadedFiles.map(file => file.path); // Cloudinary URLs
 
     // Prepare an array of candidate documents to insert
     const candidatesToInsert = [];
@@ -140,21 +132,16 @@ async function addCandidate(req, res) {
     const result = await Candidate.insertMany(candidatesToInsert);
     console.log("Candidates inserted successfully");
 
-    res
-      .status(200)
-      .json({
-        result: result.map((candidate) => ({
-          message: `Candidate ${candidate.name} inserted with ID ${candidate.id}`,
-        })),
-      });
+    res.status(200).json({
+      result: result.map((candidate) => ({
+        message: `Candidate ${candidate.name} inserted with ID ${candidate.id}`,
+      })),
+    });
   } catch (error) {
     console.error("Error occurred:", error);
-    res
-      .status(500)
-      .json({ error: error.message || "Failed to add candidates" });
+    res.status(500).json({ error: error.message || "Failed to add candidates" });
   } finally {
-   
-    console.log("end addCandidate")
+    console.log("end addCandidate");
   }
 }
 

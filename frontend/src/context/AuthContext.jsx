@@ -4,6 +4,7 @@ import { msalConfig, loginRequest, graphConfig } from '../config/msalConfig';
 import { checkAdmin } from '../services/authService';
 import { getVoterByMail } from '../services/voterService';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export const AuthContext = createContext();
 
@@ -13,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   const [account, setAccount] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isAdmin, setIsAdmin] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // Added loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const initializeMsalInstance = async () => {
@@ -27,7 +28,7 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         console.error(error);
       } finally {
-        setIsLoading(false); // Set loading to false after initialization
+        setIsLoading(false);
       }
     };
     initializeMsalInstance();
@@ -35,7 +36,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async () => {
     try {
-      setIsLoading(true); // Set loading to true during login
+      setIsLoading(true);
       await msalInstance.handleRedirectPromise();
       const loginResponse = await msalInstance.loginPopup(loginRequest);
       setAccount(loginResponse.account);
@@ -43,7 +44,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoading(false); // Set loading to false after login
+      setIsLoading(false);
     }
   };
 
@@ -74,19 +75,47 @@ export const AuthProvider = ({ children }) => {
         },
       });
 
+      // Check if the user is an admin
       const scanAdmin = await checkAdmin(userResponse.data.userPrincipalName);
       setIsAdmin(scanAdmin ? true : false);
 
-      let userData = await getVoterByMail(userResponse.data.userPrincipalName)
-  
-      userResponse.data.electionName = userData.election_name
-      userResponse.data.status = userData.status
+      if (!scanAdmin) {
+        try {
+          let userData = await getVoterByMail(userResponse.data.userPrincipalName);
+          userResponse.data.electionName = userData.election_name;
+          userResponse.data.status = userData.status;
+        } catch (error) {
+          // Handle "voter not found" error
+          if (error.response && error.response.data && error.response.data.error === 'voter not found') {
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'คุณไม่มีสิทธิ์เข้าถึงการเลือกตั้งนี้',
+            });
+
+            // Clear local storage and reload after a delay
+            setTimeout(() => {
+              localStorage.clear();
+              sessionStorage.clear();
+              window.location.reload();
+            }, 2000); // 3 seconds delay
+          } else {
+            console.error(error);
+          }
+          userResponse.data.electionName = null;
+          userResponse.data.status = null;
+        }
+      } else {
+        // Admin-specific logic (if needed)
+        userResponse.data.electionName = null;
+        userResponse.data.status = null;
+      }
 
       const photoResponse = await axios.get(`${graphConfig.graphMeEndpoint}/photo/$value`, {
         headers: {
           Authorization: `Bearer ${tokenResponse.accessToken}`,
         },
-        responseType: 'blob'
+        responseType: 'blob',
       });
 
       const photoUrl = URL.createObjectURL(photoResponse.data);

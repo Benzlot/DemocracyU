@@ -1,8 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { getElectionbyName } from '../services/electionService'; // Ensure this function is available
-import { getElection } from '../services/electionService';
+import { getElectionbyName } from '../services/electionService';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { getVoterByMail } from '../services/voterService';
 import Swal from 'sweetalert2';
@@ -10,8 +9,9 @@ import Swal from 'sweetalert2';
 const UserDashboard = () => {
   const { account, userData } = useContext(AuthContext);
   const [electionName, setElectionName] = useState(userData.electionName);
-  const [isButtonVisible, setIsButtonVisible] = useState(true); // State for button visibility
+  const [isButtonVisible, setIsButtonVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasVoted, setHasVoted] = useState(false); // New state for voting status
 
   async function checkStatusMail(mail) {
     try {
@@ -22,19 +22,13 @@ const UserDashboard = () => {
           title: 'Oops...',
           text: 'คุณไม่มีสิทธิ์เข้าถึงการเลือกตั้งนี้',
           confirmButtonText: 'OK',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Clear login data
-            // For cookies, you can use a library like js-cookie
-            // Cookies.remove('your-cookie-name');
-
-            // For localStorage
-            localStorage.clear();
-
-            // Navigate to login page
-            window.location.reload();
-          }
+        }).then(() => {
+          localStorage.clear();
+          window.location.reload();
         });
+      } else {
+        // Update the hasVoted state based on the voter's status
+        setHasVoted(rawData.status === '1'); // Assuming '1' means the voter has voted
       }
     } catch (error) {
       console.error(error);
@@ -65,7 +59,7 @@ const UserDashboard = () => {
       checkStatusMail(account.username);
     }
     handleDateChange();
-  }, [account?.name, userData]); 
+  }, [account?.username, userData]);
 
   if (isLoading) {
     return (
@@ -95,7 +89,7 @@ const UserDashboard = () => {
         className="News"
         alt="News Image"
       />
-      {isButtonVisible && (
+      {isButtonVisible && !hasVoted && (
         <div className="vote-container">
           <Link to="/vote" className="vote-button">
             <img

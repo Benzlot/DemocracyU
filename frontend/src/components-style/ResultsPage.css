@@ -31,7 +31,7 @@
     width: 100%;
 
     border-radius: 10px;
-
+    
     padding: 5vw 5vw 0vw 20vw;
     gap: 2rem; /* Space between chart and candidates */
   }
@@ -121,7 +121,7 @@
   .Notoff {
     display: flex;
     justify-content: center;
-    margin-bottom: -7vw;
+    margin-bottom: -10vw;
   }
   
   .ReImg {
@@ -192,7 +192,7 @@
     .chart-container {
       width: 200px; /* Adjust width */
       height: 200px; /* Adjust height */
-      margin-left: 7rem;
+      margin-left: 0rem;
     }
   
     .chart-text {

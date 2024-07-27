@@ -2,7 +2,7 @@ export const msalConfig = {
     auth: {
       clientId: 'edaf0096-1c9b-45d9-82ed-f74550b4bd17', 
       authority: 'https://login.microsoftonline.com/f7445e93-7b8f-4bb9-9ac8-b30d33268565', 
-      redirectUri: '/', // Replace with your redirect URI
+      redirectUri: 'https://democracy-u.netlify.app', // Replace with your redirect URI
     },
     cache: {
       cacheLocation: 'localStorage', // This configures where your cache will be stored
